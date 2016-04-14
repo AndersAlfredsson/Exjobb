@@ -7,12 +7,11 @@ import java.sql.*;
  */
 public class DatabaseConnection {
     private Connection connection = null;
-    private Statement statement = null;
     private ResultSet resultSet = null;
     private final String DRIVER = "org.sqlite.JDBC";
     private final String URL = "JDBC:sqlite:src/com/Database/DB.db";
 
-    private void setupDBConnection(){
+    public void setupDBConnection(){
         try {
             Class.forName(DRIVER);
         } catch (ClassNotFoundException e) {
@@ -20,11 +19,27 @@ public class DatabaseConnection {
         }
     }
 
-    private void connectToDB(){
+    public void connectToDB(){
         try {
             connection = DriverManager.getConnection(URL);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public Connection getConnection() {
+        return connection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
+    }
+
+    public ResultSet getResultSet() {
+        return resultSet;
+    }
+
+    public void setResultSet(ResultSet resultSet) {
+        this.resultSet = resultSet;
     }
 }

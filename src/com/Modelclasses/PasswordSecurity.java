@@ -39,6 +39,10 @@ public class PasswordSecurity
                 byte[] digestedPassword = messageDigest.digest();
                 String hs = new String(digestedPassword, "UTF-8");
 
+                for(byte b: hashWithSalt)
+                {
+                    System.out.print(b + " ");
+                }
 
                 user.setSalt(new String(salt, "UTF-8"));
                 user.setPassword(hs);

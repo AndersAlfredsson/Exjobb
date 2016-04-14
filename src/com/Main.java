@@ -10,6 +10,6 @@ public class Main {
         ApplicationUserDAOimpl testdao = new ApplicationUserDAOimpl();
         ApplicationUser user = new ApplicationUser(2,"a@a.com", "TAYTO", "");
         PasswordSecurity ps = new PasswordSecurity(user);
-        testdao.insertUser(user);
+        //testdao.insertUser(user);
     }
 }
