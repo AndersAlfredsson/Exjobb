@@ -34,12 +34,27 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
 
     @Override
     public void updateUser(ApplicationUser user) {
-
+        connectToDB();
+        try {
+            PreparedStatement pstatement =  dbc.getConnection().prepareStatement("UPDATE Users SET Password = ? WHERE Email = ?;");
+            pstatement.setString(1, user.getPassword());
+            pstatement.setString(2, user.getEmail());
+            pstatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void deleteUser(ApplicationUser user) {
-
+        connectToDB();
+        try {
+            PreparedStatement pstatement =  dbc.getConnection().prepareStatement("DELETE FROM Users WHERE Email = ?;");
+            pstatement.setString(1, user.getEmail());
+            pstatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     //Skydd mot sqlinjection med Preparet Statement.

@@ -12,7 +12,7 @@ public class ApplicationUser {
 
     public ApplicationUser(int ID, String email, String password, String salt){
         this.ID = ID;
-
+        this.salt = salt;
 
         this.email = email;
         this.password = password;
