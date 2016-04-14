@@ -1,4 +1,4 @@
-package com.company.Modelclasses;
+package com.Modelclasses;
 
 import sun.plugin2.message.Message;
 
@@ -38,6 +38,10 @@ public class PasswordSecurity
                 messageDigest.update(hashWithSalt);
                 byte[] digestedPassword = messageDigest.digest();
                 String hs = new String(digestedPassword, "UTF-8");
+
+
+                user.setSalt(new String(salt, "UTF-8"));
+                user.setPassword(hs);
 
                 System.out.println("password: " + new String(hash, "UTF-8"));
                 System.out.println("salt: " + new String(salt, "UTF-8"));

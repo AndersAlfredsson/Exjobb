@@ -10,7 +10,10 @@ public class ApplicationUser {
     private String password;
     private String salt;
 
-    public ApplicationUser(String email, String password){
+    public ApplicationUser(int ID, String email, String password, String salt){
+        this.ID = ID;
+
+
         this.email = email;
         this.password = password;
     }
