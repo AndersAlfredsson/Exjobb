@@ -1,75 +1,145 @@
 package com.Modelclasses;
 
-import sun.plugin2.message.Message;
+import com.sun.deploy.util.ArrayUtil;
+import com.sun.org.apache.xpath.internal.SourceTree;
+import com.sun.xml.internal.ws.commons.xmlutil.Converter;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Random;
 
 /**
  * Created by Gustav on 2016-04-14.
  * The class that takes a password and makes it secure for saving on the database
+ * also does authentication on login attempt
  */
 public class PasswordSecurity
 {
     public PasswordSecurity(ApplicationUser user)
     {
-        hashPassword(user);
+        hashPassword(user, false);
     }
 
-    private boolean hashPassword(ApplicationUser user)
+    /**
+     * Main function for hashing a password and adding a salt before hashing
+     * @param user
+     * @return
+     */
+    private boolean hashPassword(ApplicationUser user, boolean isSaltGenerated)
     {
-        byte[] salt = generateSalt();
         try
         {
-            //Gets the hashing algorithm
+            byte[] password = user.getPassword().getBytes();
+            byte[] salt = generateSalt();
+            byte[] concatenated = concatenateArrays(password, salt);
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            try
-            {
-                byte[] hash = user.getPassword().getBytes("UTF-8");
-                byte[] hashWithSalt = new byte[hash.length + salt.length];
-                System.arraycopy(hash, 0, hashWithSalt, 0, hash.length);
-                System.arraycopy(salt, 0, hashWithSalt, hash.length, salt.length);
+            byte[] hash = messageDigest.digest(concatenated);
+            messageDigest.reset();
 
-                messageDigest.update(hashWithSalt);
-                byte[] digestedPassword = messageDigest.digest();
-                String hs = new String(digestedPassword, "UTF-8");
+            String s = convertToString(salt);
+            user.setPassword(convertToString(hash));
+            user.setSalt(s);
 
-                for(byte b: hashWithSalt)
-                {
-                    System.out.print(b + " ");
-                }
-
-                user.setSalt(new String(salt, "UTF-8"));
-                user.setPassword(hs);
-
-                System.out.println("password: " + new String(hash, "UTF-8"));
-                System.out.println("salt: " + new String(salt, "UTF-8"));
-                System.out.println("hash+salt: " + hs);
-            }
-            catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-                return false;
-            }
+            byte[] test = convertToByte(s);
+            System.out.println("Tals: " + convertToString(test));
+            return true;
         }
         catch (NoSuchAlgorithmException e)
         {
             e.printStackTrace();
             return false;
         }
-        return true;
+
     }
+
+
+    /**
+     * Should get the salt from the database to convert it back to a byte array to be able to compare password
+     * @param salt
+     * @return
+     */
+    private byte[] convertToByte(String salt)
+    {
+        System.out.println("Salt: " + salt);
+        char[] charSet = salt.toCharArray();
+        byte[] byteArray = new byte[charSet.length/2];
+
+        for(int i = 0; i < charSet.length; i+=2)
+        {
+            StringBuilder curr = new StringBuilder(2);
+            curr.append(charSet[i]).append(charSet[i+1]);
+            byteArray[i/2] = (byte) Integer.parseInt(curr.toString(), 16);
+        }
+        return byteArray;
+    }
+
+    /**
+     * Converts an array of bytes to a readable string
+     * @param bytes
+     * @return
+     */
+    private String convertToString(byte[] bytes)
+    {
+        StringBuffer sb = new StringBuffer();
+        char[] charSet = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+        for(int i = 0; i < bytes.length; i++)
+        {
+            byte b = bytes[i];
+            sb.append(charSet[(b&0xF0) >> 4]);
+            sb.append(charSet[b&0x0F]);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Takes a user with the password in clear text, salt from DB and password from DB
+     * it should hash the password from user with the salt from DB and then compare if it
+     * is the same as the password from the DB
+     * @param user
+     * @param DbUser
+     * @return
+     */
+    public boolean authenticate(ApplicationUser user, ApplicationUser DbUser)
+    {
+        user.setSalt(DbUser.getSalt());
+        hashPassword(user, true);
+        String pw = user.getPassword();
+
+        if(DbUser.getPassword().equals(pw))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Takes two byte arrays and puts one at the end of the other to make a new array with both and returns it
+     * @param hash
+     * @param salt
+     * @return
+     */
+    private byte[] concatenateArrays(byte[] hash, byte[] salt)
+    {
+        byte[] hashWithSalt = new byte[hash.length + salt.length];
+
+        System.arraycopy(hash, 0, hashWithSalt, 0, hash.length);
+        System.arraycopy(salt, 0, hashWithSalt, hash.length, salt.length);
+        return hashWithSalt;
+    }
+
 
     /**
      * Generates a 64 byte long random salt for use when hashing the password
      */
     private byte[] generateSalt()
     {
-        byte[] salt = new byte[64];
+        byte[] salt = new byte[10];
         try
         {
             SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
@@ -78,7 +148,7 @@ public class PasswordSecurity
         }
         catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 }
