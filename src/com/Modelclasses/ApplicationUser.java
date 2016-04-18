@@ -13,9 +13,26 @@ public class ApplicationUser {
     public ApplicationUser(int ID, String email, String password, String salt){
         this.ID = ID;
         this.salt = salt;
-
         this.email = email;
         this.password = password;
+    }
+
+    public ApplicationUser(String email, String password){
+        this.email = email;
+        this.password = password;
+    }
+
+    /**
+     * For printing purposes.
+     * @return
+     */
+    @Override
+    public String toString() {
+        return ID + email + password + salt;
+    }
+
+    public void print(){
+        System.out.println(this.toString());
     }
 
     //Getters and Setters

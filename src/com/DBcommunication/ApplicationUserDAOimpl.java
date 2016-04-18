@@ -5,7 +5,7 @@ import com.Modelclasses.ApplicationUser;
 import com.sun.glass.ui.EventLoop;
 
 import java.sql.*;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -17,6 +17,7 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
     public ApplicationUserDAOimpl(){
     }
 
+    //TODO : ska flyttas till annan klass
     private void connectToDB(){
         dbc.setupDBConnection();
         dbc.connectToDB();
@@ -24,14 +25,43 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
 
     @Override
     public List<ApplicationUser> getAllUsers() {
+        connectToDB();
+        try {
+            PreparedStatement pstatement =  dbc.getConnection().prepareStatement("SELECT * FROM Users");
+            ResultSet result = pstatement.executeQuery();
+            return generateListFromResultSet(result);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
+    }
+
+    private List<ApplicationUser> generateListFromResultSet(ResultSet resultSet){
+        List<ApplicationUser> userList = new LinkedList<>();
+        try {
+            while (resultSet.next()){
+                int ID = resultSet.getInt("ID");
+                String email = resultSet.getString("Email");
+                String password = resultSet.getString("Password");
+                String salt = resultSet.getString("Salt");
+                ApplicationUser user = new ApplicationUser(ID, email, password, salt);
+                userList.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userList;
     }
 
     @Override
-    public ApplicationUser getUser(String email) {
+    public ResultSet getUser(String email) {
         return null;
     }
 
+    /**
+     * Updates a users password
+     * @param user
+     */
     @Override
     public void updateUser(ApplicationUser user) {
         connectToDB();
@@ -45,6 +75,10 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
         }
     }
 
+    /**
+     * Deletes a user from the database.
+     * @param user
+     */
     @Override
     public void deleteUser(ApplicationUser user) {
         connectToDB();
@@ -58,15 +92,21 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
     }
 
     //Skydd mot sqlinjection med Preparet Statement.
+
+    /**
+     * Inserts a user into the database.
+     * @param user
+     */
     @Override
     public void insertUser(ApplicationUser user) {
         connectToDB();
         try {
-            PreparedStatement pstatement =  dbc.getConnection().prepareStatement("INSERT INTO Users(ID, Email, Password, Salt) VALUES (?, ?, ?, ?);");
-            pstatement.setInt(1, user.getID());
-            pstatement.setString(2,user.getEmail());
-            pstatement.setString(3, user.getPassword());
-            pstatement.setString(4, user.getSalt());
+            PreparedStatement pstatement =  dbc.getConnection().prepareStatement("INSERT INTO Users(Email, Password, Salt) VALUES (?, ?, ?);");
+            pstatement.setString(1, user.getEmail());
+            pstatement.setString(2, user.getPassword());
+
+            //Fusksalt tillsvidare.
+            pstatement.setString(3, "igigiohuiuiugi");
             pstatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

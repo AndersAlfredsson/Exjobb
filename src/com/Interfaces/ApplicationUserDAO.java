@@ -2,6 +2,7 @@ package com.Interfaces;
 
 import com.Modelclasses.ApplicationUser;
 
+import java.sql.ResultSet;
 import java.util.List;
 
 /**
@@ -10,7 +11,7 @@ import java.util.List;
  */
 public interface ApplicationUserDAO {
     public List<ApplicationUser> getAllUsers();
-    public ApplicationUser getUser(String email);
+    public ResultSet getUser(String email);
     public void updateUser(ApplicationUser user);
     public void deleteUser(ApplicationUser user);
     public void insertUser(ApplicationUser user);
