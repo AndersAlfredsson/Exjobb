@@ -10,9 +10,9 @@ import java.util.List;
  * Interface implemented by the class that is interacting with the database.
  */
 public interface ApplicationUserDAO {
-    public List<ApplicationUser> getAllUsers();
-    public ResultSet getUser(String email);
-    public void updateUser(ApplicationUser user);
-    public void deleteUser(ApplicationUser user);
-    public void insertUser(ApplicationUser user);
+    List<ApplicationUser> getAllUsers();
+    ApplicationUser getUser(String email);
+    void updateUser(ApplicationUser user);
+    void deleteUser(ApplicationUser user);
+    void insertUser(ApplicationUser user);
 }

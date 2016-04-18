@@ -27,8 +27,8 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
     public List<ApplicationUser> getAllUsers() {
         connectToDB();
         try {
-            PreparedStatement pstatement =  dbc.getConnection().prepareStatement("SELECT * FROM Users");
-            ResultSet result = pstatement.executeQuery();
+            PreparedStatement preparedStatement =  dbc.getConnection().prepareStatement("SELECT * FROM Users");
+            ResultSet result = preparedStatement.executeQuery();
             return generateListFromResultSet(result);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -53,8 +53,33 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
         return userList;
     }
 
+    private ApplicationUser generateUserFromResultSet(ResultSet resultSet){
+        try {
+            if (resultSet.next()){
+                int ID = resultSet.getInt("ID");
+                String email = resultSet.getString("Email");
+                String password = resultSet.getString("Password");
+                String salt = resultSet.getString("Salt");
+                ApplicationUser user = new ApplicationUser(ID, email, password, salt);
+                return user;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     @Override
-    public ResultSet getUser(String email) {
+    public ApplicationUser getUser(String email) {
+        connectToDB();
+        try {
+            PreparedStatement preparedStatement =  dbc.getConnection().prepareStatement("SELECT * FROM Users WHERE email = ?");
+            preparedStatement.setString(1, email);
+            ResultSet result = preparedStatement.executeQuery();
+            return generateUserFromResultSet(result);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -66,10 +91,10 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
     public void updateUser(ApplicationUser user) {
         connectToDB();
         try {
-            PreparedStatement pstatement =  dbc.getConnection().prepareStatement("UPDATE Users SET Password = ? WHERE Email = ?;");
-            pstatement.setString(1, user.getPassword());
-            pstatement.setString(2, user.getEmail());
-            pstatement.executeUpdate();
+            PreparedStatement preparedStatement =  dbc.getConnection().prepareStatement("UPDATE Users SET Password = ? WHERE Email = ?;");
+            preparedStatement.setString(1, user.getPassword());
+            preparedStatement.setString(2, user.getEmail());
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -83,9 +108,9 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
     public void deleteUser(ApplicationUser user) {
         connectToDB();
         try {
-            PreparedStatement pstatement =  dbc.getConnection().prepareStatement("DELETE FROM Users WHERE Email = ?;");
-            pstatement.setString(1, user.getEmail());
-            pstatement.executeUpdate();
+            PreparedStatement preparedStatement =  dbc.getConnection().prepareStatement("DELETE FROM Users WHERE Email = ?;");
+            preparedStatement.setString(1, user.getEmail());
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -101,13 +126,13 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
     public void insertUser(ApplicationUser user) {
         connectToDB();
         try {
-            PreparedStatement pstatement =  dbc.getConnection().prepareStatement("INSERT INTO Users(Email, Password, Salt) VALUES (?, ?, ?);");
-            pstatement.setString(1, user.getEmail());
-            pstatement.setString(2, user.getPassword());
+            PreparedStatement preparedStatement =  dbc.getConnection().prepareStatement("INSERT INTO Users(Email, Password, Salt) VALUES (?, ?, ?);");
+            preparedStatement.setString(1, user.getEmail());
+            preparedStatement.setString(2, user.getPassword());
 
             //Fusksalt tillsvidare.
-            pstatement.setString(3, "igigiohuiuiugi");
-            pstatement.executeUpdate();
+            preparedStatement.setString(3, "igigiohuiuiugi");
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }

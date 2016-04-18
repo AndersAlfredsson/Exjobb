@@ -12,14 +12,16 @@ public class Main {
         ApplicationUserDAOimpl testdao = new ApplicationUserDAOimpl();
         ApplicationUser user = new ApplicationUser("b@n.com", "TATO");
         //PasswordSecurity ps = new PasswordSecurity(user);
-        testdao.insertUser(user);
+        //testdao.insertUser(user);
         //testdao.deleteUser(new ApplicationUser(2,"a@a.com", "TAYTO", ""));
         //user.setPassword("nyttpassword");
         //testdao.updateUser(user);
 
-        List<ApplicationUser> list = testdao.getAllUsers();
-        for (int i = 0; i < list.size(); i++) {
-            list.get(i).print();
-        }
+        testdao.getUser("a@a.com").print();
+
+        //List<ApplicationUser> list = testdao.getAllUsers();
+        //for (int i = 0; i < list.size(); i++) {
+        //  list.get(i).print();
+        //}
     }
 }
