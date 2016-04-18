@@ -20,7 +20,7 @@ public class PasswordSecurity
 {
     public PasswordSecurity(ApplicationUser user)
     {
-        hashPassword(user, false);
+        hashPassword(user);
     }
 
     /**
@@ -28,7 +28,7 @@ public class PasswordSecurity
      * @param user
      * @return
      */
-    private boolean hashPassword(ApplicationUser user, boolean isSaltGenerated)
+    private boolean hashPassword(ApplicationUser user)
     {
         try
         {
@@ -42,9 +42,6 @@ public class PasswordSecurity
             String s = convertToString(salt);
             user.setPassword(convertToString(hash));
             user.setSalt(s);
-
-            byte[] test = convertToByte(s);
-            System.out.println("Tals: " + convertToString(test));
             return true;
         }
         catch (NoSuchAlgorithmException e)
@@ -52,9 +49,29 @@ public class PasswordSecurity
             e.printStackTrace();
             return false;
         }
-
     }
+    private boolean hashPasswordWithExistingSalt(ApplicationUser user)
+    {
+        try
+        {
+            byte[] password = user.getPassword().getBytes();
+            byte[] salt = convertToByte(user.getSalt());
+            byte[] concatenated = concatenateArrays(password, salt);
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = messageDigest.digest(concatenated);
+            messageDigest.reset();
 
+            String s = convertToString(salt);
+            user.setPassword(convertToString(hash));
+            user.setSalt(s);
+            return true;
+        }
+        catch (NoSuchAlgorithmException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     /**
      * Should get the salt from the database to convert it back to a byte array to be able to compare password
@@ -63,7 +80,6 @@ public class PasswordSecurity
      */
     private byte[] convertToByte(String salt)
     {
-        System.out.println("Salt: " + salt);
         char[] charSet = salt.toCharArray();
         byte[] byteArray = new byte[charSet.length/2];
 
@@ -105,15 +121,16 @@ public class PasswordSecurity
     public boolean authenticate(ApplicationUser user, ApplicationUser DbUser)
     {
         user.setSalt(DbUser.getSalt());
-        hashPassword(user, true);
+        hashPasswordWithExistingSalt(user);
         String pw = user.getPassword();
-
-        if(DbUser.getPassword().equals(pw))
+        if(DbUser.getPassword().equals(pw) && DbUser.getEmail().equals(user.getEmail()))
         {
+            System.out.println("Success!");
             return true;
         }
         else
         {
+            System.out.println("Failure!");
             return false;
         }
     }
@@ -139,7 +156,7 @@ public class PasswordSecurity
      */
     private byte[] generateSalt()
     {
-        byte[] salt = new byte[10];
+        byte[] salt = new byte[64];
         try
         {
             SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
