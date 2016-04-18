@@ -18,6 +18,10 @@ import java.security.SecureRandom;
  */
 public class PasswordSecurity
 {
+    /**
+     * Constructor that takes an ApplicationUser object
+     * @param user
+     */
     public PasswordSecurity(ApplicationUser user)
     {
         hashPassword(user);
@@ -50,6 +54,12 @@ public class PasswordSecurity
             return false;
         }
     }
+
+    /**
+     * Function for hashing a password with an already existing salt
+     * @param user
+     * @return
+     */
     private boolean hashPasswordWithExistingSalt(ApplicationUser user)
     {
         try
