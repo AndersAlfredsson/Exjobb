@@ -20,11 +20,10 @@ public class PasswordSecurity
 {
     /**
      * Constructor that takes an ApplicationUser object
-     * @param user
      */
-    public PasswordSecurity(ApplicationUser user)
+    public PasswordSecurity()
     {
-        hashPassword(user);
+
     }
 
     /**
@@ -32,7 +31,7 @@ public class PasswordSecurity
      * @param user
      * @return
      */
-    private boolean hashPassword(ApplicationUser user)
+    public static boolean hashPassword(ApplicationUser user)
     {
         try
         {
@@ -60,7 +59,7 @@ public class PasswordSecurity
      * @param user
      * @return
      */
-    private boolean hashPasswordWithExistingSalt(ApplicationUser user)
+    private static boolean hashPasswordWithExistingSalt(ApplicationUser user)
     {
         try
         {
@@ -88,7 +87,7 @@ public class PasswordSecurity
      * @param salt
      * @return
      */
-    private byte[] convertToByte(String salt)
+    private static byte[] convertToByte(String salt)
     {
         char[] charSet = salt.toCharArray();
         byte[] byteArray = new byte[charSet.length/2];
@@ -107,7 +106,7 @@ public class PasswordSecurity
      * @param bytes
      * @return
      */
-    private String convertToString(byte[] bytes)
+    private static String convertToString(byte[] bytes)
     {
         StringBuffer sb = new StringBuffer();
         char[] charSet = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
@@ -128,7 +127,7 @@ public class PasswordSecurity
      * @param DbUser
      * @return
      */
-    public boolean authenticate(ApplicationUser user, ApplicationUser DbUser)
+    public static boolean authenticate(ApplicationUser user, ApplicationUser DbUser)
     {
         user.setSalt(DbUser.getSalt());
         hashPasswordWithExistingSalt(user);
@@ -151,7 +150,7 @@ public class PasswordSecurity
      * @param salt
      * @return
      */
-    private byte[] concatenateArrays(byte[] hash, byte[] salt)
+    private static byte[] concatenateArrays(byte[] hash, byte[] salt)
     {
         byte[] hashWithSalt = new byte[hash.length + salt.length];
 
@@ -164,7 +163,7 @@ public class PasswordSecurity
     /**
      * Generates a 64 byte long random salt for use when hashing the password
      */
-    private byte[] generateSalt()
+    private static byte[] generateSalt()
     {
         byte[] salt = new byte[64];
         try
