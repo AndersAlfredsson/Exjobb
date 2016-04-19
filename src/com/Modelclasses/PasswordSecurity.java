@@ -134,12 +134,12 @@ public class PasswordSecurity
         String pw = user.getPassword();
         if(DbUser.getPassword().equals(pw) && DbUser.getEmail().equals(user.getEmail()))
         {
-            System.out.println("Success!");
+            //System.out.println("Success!");
             return true;
         }
         else
         {
-            System.out.println("Failure!");
+            //System.out.println("Failure!");
             return false;
         }
     }

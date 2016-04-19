@@ -1,5 +1,8 @@
 package com.Modelclasses.LoginServerclasses;
 
+import com.Modelclasses.ApplicationUser;
+import com.Modelclasses.PasswordSecurity;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -22,8 +25,6 @@ public class UserHandler implements Runnable, Serializable
     public UserHandler(Socket socket) throws IOException
     {
         this.SOCKET = socket;
-       // this.IN = new BufferedReader(new InputStreamReader(SOCKET.getInputStream()));
-       // this.OUT = new PrintWriter(SOCKET.getOutputStream(), true);
         this.IN = new ObjectInputStream(socket.getInputStream());
         this.OUT = new ObjectOutputStream(socket.getOutputStream());
     }
@@ -76,9 +77,23 @@ public class UserHandler implements Runnable, Serializable
         this.connected = true;
         while(this.connected)
         {
-            /*try
+            try
             {
-                //TestingClient.TestObject t = (TestingClient.TestObject) this.IN.readObject();
+                ApplicationUser user = (ApplicationUser) this.IN.readObject();
+                //registerNewUser(user);
+                boolean result = loginAttempt(user);
+
+                if(result)
+                {
+                    System.out.println("Login Successful, have fun!");
+                    this.connected = false;
+                    this.SOCKET.close();
+                }
+                else
+                {
+                    this.connected = false;
+                    this.SOCKET.close();
+                }
             }
             catch (IOException e)
             {
@@ -86,7 +101,44 @@ public class UserHandler implements Runnable, Serializable
             } catch (ClassNotFoundException e)
             {
                 e.printStackTrace();
-            }*/
+            }
+        }
+    }
+
+    /**
+     * Testing function for "registering an account" over the socket, will change soon
+     * @param user
+     */
+    private void registerNewUser(ApplicationUser user)
+    {
+        PasswordSecurity.hashPassword(user);
+        System.out.println(user.getPassword());
+        System.out.println("Register Complete");
+    }
+
+    /**
+     * Testing function for "a login attempt" over the socket, will change soon
+     * @param user
+     */
+    private boolean loginAttempt(ApplicationUser user)
+    {
+        //should try to get password, email and salt from the DB and put in a object for comparison
+        String pw = user.getPassword();
+        PasswordSecurity.hashPassword(user);
+        ApplicationUser test = new ApplicationUser(1, user.getEmail(), user.getPassword(), user.getSalt());
+        user.setPassword(pw);
+        //End temporary code for testing
+
+        boolean result = PasswordSecurity.authenticate(user, test);
+        if(result)
+        {
+            System.out.println("Login Successful");
+            return true;
+        }
+        else
+        {
+            System.out.println("Login unsuccessful");
+            return false;
         }
     }
 }
