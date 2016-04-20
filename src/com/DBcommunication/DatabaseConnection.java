@@ -2,6 +2,8 @@ package com.DBcommunication;
 
 import java.sql.*;
 
+
+
 /**
  * Created by Anders on 2016-04-14.
  */
@@ -18,6 +20,7 @@ public class DatabaseConnection {
             e.printStackTrace();
         }
     }
+
 
     public void connectToDB(){
         try {

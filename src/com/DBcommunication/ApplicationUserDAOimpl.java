@@ -2,8 +2,6 @@ package com.DBcommunication;
 
 import com.Interfaces.ApplicationUserDAO;
 import com.Modelclasses.ApplicationUser;
-import com.sun.glass.ui.EventLoop;
-
 import java.sql.*;
 import java.util.*;
 
@@ -15,7 +13,10 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
     DatabaseConnection dbc = new DatabaseConnection();
 
     public ApplicationUserDAOimpl(){
+
     }
+
+
 
     //TODO : ska flyttas till annan klass
     private void connectToDB(){
@@ -119,6 +120,7 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
     //Skydd mot sqlinjection med Preparet Statement.
 
     /**
+
      * Inserts a user into the database.
      * @param user
      */
@@ -132,7 +134,10 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
 
             //Fusksalt tillsvidare.
             preparedStatement.setString(3, "igigiohuiuiugi");
-            preparedStatement.executeUpdate();
+            if (preparedStatement.executeUpdate() == 0){
+                System.out.println("Trollololo");
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
