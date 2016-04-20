@@ -1,10 +1,13 @@
 package com.Modelclasses;
 
+import java.io.Serializable;
+
 /**
  * Created by Anders on 2016-04-14.
  * Class representing an android application user.
  */
-public class ApplicationUser {
+public class ApplicationUser implements Serializable
+{
     private int ID;
     private String email;
     private String password;
