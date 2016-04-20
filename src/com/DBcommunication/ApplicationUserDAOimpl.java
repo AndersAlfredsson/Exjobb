@@ -1,6 +1,8 @@
 package com.DBcommunication;
 
+import com.Enums.LogEvents;
 import com.Interfaces.ApplicationUserDAO;
+import com.Logging.Logging;
 import com.Modelclasses.ApplicationUser;
 import java.sql.*;
 import java.util.*;
@@ -11,6 +13,7 @@ import java.util.*;
  */
 public class ApplicationUserDAOimpl implements ApplicationUserDAO {
     DatabaseConnection dbc = new DatabaseConnection();
+    Logging log = new Logging(); //Statisk sen?
 
     public ApplicationUserDAOimpl(){
 
@@ -136,6 +139,10 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
             preparedStatement.setString(3, "igigiohuiuiugi");
             if (preparedStatement.executeUpdate() == 0){
                 System.out.println("Trollololo");
+            }
+            else {
+                log.logEvent(LogEvents.Insert,user);
+                System.out.println("log");
             }
 
         } catch (SQLException e) {
