@@ -12,12 +12,18 @@ import java.util.Date;
 
 /**
  * Created by Anders on 2016-04-19.
+ * Class to handle logging to database.
  */
 public class Logging {
 
     public Logging() {
     }
 
+    /**
+     * Logs an event to the database.
+     * @param event
+     * @param user
+     */
     public void logEvent(LogEvents event, ApplicationUser user){
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();

@@ -11,6 +11,7 @@ import java.util.*;
 
 /**
  * Created by Anders on 2016-04-14.
+ * Class that handles all database actions for the ApplicationUser Class.
  */
 public class ApplicationUserDAOimpl implements ApplicationUserDAO {
 
@@ -19,6 +20,10 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
 
     }
 
+    /**
+     * Gets all users from the database.
+     * @return
+     */
     @Override
     public List<ApplicationUser> getAllUsers() {
         try {
@@ -31,6 +36,11 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
         return null;
     }
 
+    /**
+     * Takes a resultSet and converts to a user.
+     * @param resultSet
+     * @return
+     */
     private List<ApplicationUser> generateListFromResultSet(ResultSet resultSet){
         List<ApplicationUser> userList = new LinkedList<>();
         try {
@@ -48,6 +58,11 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
         return userList;
     }
 
+    /**
+     * Takes a resultSet and converts to a list of users.
+     * @param resultSet
+     * @return
+     */
     private ApplicationUser generateUserFromResultSet(ResultSet resultSet){
         try {
             if (resultSet.next()){
@@ -64,6 +79,11 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
         return null;
     }
 
+    /**
+     * Gets user with matching email from the database if there is such a user.
+     * @param email
+     * @return
+     */
     @Override
     public ApplicationUser getUser(String email) {
         try {

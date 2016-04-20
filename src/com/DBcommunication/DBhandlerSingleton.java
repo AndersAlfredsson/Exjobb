@@ -11,7 +11,6 @@ import java.util.List;
 /**
  * Created by Anders on 2016-04-14.
  */
-//Singeltonera mera.
 public class DBhandlerSingleton {
     private static DBhandlerSingleton INSTANCE = null;
     private ApplicationUserDAOimpl applicationUserDAOimpl;
@@ -22,6 +21,12 @@ public class DBhandlerSingleton {
     private final String URL = "JDBC:sqlite:src/com/Database/DB.db";
 
 
+    //
+
+    /**
+     * Private constructor to prevent initialization from outside of the class.
+     * Instantiates the objects used for logging and database communication.
+     */
     private DBhandlerSingleton(){
         applicationUserDAOimpl = new ApplicationUserDAOimpl();
         logger = new Logging();
@@ -29,6 +34,11 @@ public class DBhandlerSingleton {
         connectToDB();
     }
 
+    /**
+     * Returns the instance of the singleton.
+     * Creates new instance of the object if the INSTANCE variable is null.
+     * @return
+     */
     public static DBhandlerSingleton getInstance(){
         if (INSTANCE == null){
             INSTANCE = new DBhandlerSingleton();
@@ -36,7 +46,10 @@ public class DBhandlerSingleton {
         return INSTANCE;
     }
 
-    public void setupDBConnection(){
+    /**
+     * Selects the driver to use for the database connection.
+     */
+    private void setupDBConnection(){
         try {
             Class.forName(DRIVER);
         } catch (ClassNotFoundException e) {
@@ -44,7 +57,10 @@ public class DBhandlerSingleton {
         }
     }
 
-    public void connectToDB(){
+    /**
+     * Connects to the database.
+     */
+    private void connectToDB(){
         try {
             connection = DriverManager.getConnection(URL);
         } catch (SQLException e) {
@@ -52,6 +68,12 @@ public class DBhandlerSingleton {
         }
     }
 
+    /**
+     * Checks if the connection to the database is valid.
+     * If the connection is not valid an atempt to reconnect to the database will be made.
+     * The method returns if the database is valid or not after one reconnection attempt.
+     * @return
+     */
     private boolean checkConnection(){
         try {
             if (!connection.isValid(10)){
@@ -68,24 +90,40 @@ public class DBhandlerSingleton {
         }
     }
 
+    /**
+     * Calls the insertUser in the ApplicationUser class if the connection is valid.
+     * @param user
+     */
     public void insertUser(ApplicationUser user){
         if (checkConnection()){
             applicationUserDAOimpl.insertUser(user);
         }
     }
 
+    /**
+     * Calls the updateUser in the ApplicationUser class if the connection is valid.
+     * @param user
+     */
     public void updateUser(ApplicationUser user){
         if (checkConnection()){
             applicationUserDAOimpl.deleteUser(user);
         }
     }
 
+    /**
+     * Calls the deleteUser in the ApplicationUser class if the connection is valid.
+     * @param user to be deleted.
+     */
     public void deleteUser(ApplicationUser user){
         if (checkConnection()){
             applicationUserDAOimpl.updateUser(user);
         }
     }
 
+    /**
+     * Calls the getAllUsers in the ApplicationUser class if the connection is valid.
+     * @return returns all users in the database.
+     */
     public List<ApplicationUser> getAllUsers(){
         List<ApplicationUser> userList = null;
         if (checkConnection()){
@@ -94,6 +132,11 @@ public class DBhandlerSingleton {
         return userList;
     }
 
+    /**
+     * Calls the getUser in the ApplicationUser class if the connection is valid.
+     * @param email
+     * @return the user with the matching email.
+     */
     public ApplicationUser getUser(String email){
         ApplicationUser user = null;
         if (checkConnection()){
@@ -102,12 +145,18 @@ public class DBhandlerSingleton {
         return user;
     }
 
+    /**
+     * Logs an event to the database by calling the logEvent method in Logging class.
+     * @param event
+     * @param user
+     */
     public void log(LogEvents event, ApplicationUser user){
         if (checkConnection()){
             logger.logEvent(event, user);
         }
     }
 
+    //Getters and Setters.
     public Connection getConnection() {
         return connection;
     }
