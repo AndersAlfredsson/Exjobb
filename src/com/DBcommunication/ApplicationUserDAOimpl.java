@@ -2,8 +2,9 @@ package com.DBcommunication;
 
 import com.Enums.LogEvents;
 import com.Interfaces.ApplicationUserDAO;
-import com.Logging.Logging;
 import com.Modelclasses.ApplicationUser;
+import com.Modelclasses.PasswordSecurity;
+
 import java.sql.*;
 import java.util.*;
 
@@ -12,8 +13,7 @@ import java.util.*;
  * Created by Anders on 2016-04-14.
  */
 public class ApplicationUserDAOimpl implements ApplicationUserDAO {
-    DatabaseConnection dbc = new DatabaseConnection();
-    Logging log = new Logging(); //Statisk sen?
+
 
     public ApplicationUserDAOimpl(){
 
@@ -21,17 +21,12 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
 
 
 
-    //TODO : ska flyttas till annan klass
-    private void connectToDB(){
-        dbc.setupDBConnection();
-        dbc.connectToDB();
-    }
+
 
     @Override
     public List<ApplicationUser> getAllUsers() {
-        connectToDB();
         try {
-            PreparedStatement preparedStatement =  dbc.getConnection().prepareStatement("SELECT * FROM Users");
+            PreparedStatement preparedStatement =  DBhandlerSingleton.getInstance().getConnection().prepareStatement("SELECT * FROM Users");
             ResultSet result = preparedStatement.executeQuery();
             return generateListFromResultSet(result);
         } catch (SQLException e) {
@@ -75,9 +70,8 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
 
     @Override
     public ApplicationUser getUser(String email) {
-        connectToDB();
         try {
-            PreparedStatement preparedStatement =  dbc.getConnection().prepareStatement("SELECT * FROM Users WHERE email = ?");
+            PreparedStatement preparedStatement =  DBhandlerSingleton.getInstance().getConnection().prepareStatement("SELECT * FROM Users WHERE email = ?");
             preparedStatement.setString(1, email);
             ResultSet result = preparedStatement.executeQuery();
             return generateUserFromResultSet(result);
@@ -93,9 +87,8 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
      */
     @Override
     public void updateUser(ApplicationUser user) {
-        connectToDB();
         try {
-            PreparedStatement preparedStatement =  dbc.getConnection().prepareStatement("UPDATE Users SET Password = ? WHERE Email = ?;");
+            PreparedStatement preparedStatement =  DBhandlerSingleton.getInstance().getConnection().prepareStatement("UPDATE Users SET Password = ? WHERE Email = ?;");
             preparedStatement.setString(1, user.getPassword());
             preparedStatement.setString(2, user.getEmail());
             preparedStatement.executeUpdate();
@@ -110,9 +103,8 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
      */
     @Override
     public void deleteUser(ApplicationUser user) {
-        connectToDB();
         try {
-            PreparedStatement preparedStatement =  dbc.getConnection().prepareStatement("DELETE FROM Users WHERE Email = ?;");
+            PreparedStatement preparedStatement =  DBhandlerSingleton.getInstance().getConnection().prepareStatement("DELETE FROM Users WHERE Email = ?;");
             preparedStatement.setString(1, user.getEmail());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
@@ -120,7 +112,7 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
         }
     }
 
-    //Skydd mot sqlinjection med Preparet Statement.
+
 
     /**
 
@@ -129,19 +121,17 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
      */
     @Override
     public void insertUser(ApplicationUser user) {
-        connectToDB();
+        PasswordSecurity.hashPassword(user);
         try {
-            PreparedStatement preparedStatement =  dbc.getConnection().prepareStatement("INSERT INTO Users(Email, Password, Salt) VALUES (?, ?, ?);");
+            PreparedStatement preparedStatement =  DBhandlerSingleton.getInstance().getConnection().prepareStatement("INSERT INTO Users(Email, Password, Salt) VALUES (?, ?, ?);");
             preparedStatement.setString(1, user.getEmail());
             preparedStatement.setString(2, user.getPassword());
-
-            //Fusksalt tillsvidare.
-            preparedStatement.setString(3, "igigiohuiuiugi");
+            preparedStatement.setString(3, user.getSalt());
             if (preparedStatement.executeUpdate() == 0){
                 System.out.println("Trollololo");
             }
             else {
-                log.logEvent(LogEvents.Insert,user);
+                DBhandlerSingleton.getInstance().log(LogEvents.Insert, user);
                 System.out.println("log");
             }
 

@@ -1,5 +1,7 @@
 package com.Modelclasses.LoginServerclasses;
 
+import com.DBcommunication.ApplicationUserDAOimpl;
+import com.DBcommunication.DBhandlerSingleton;
 import com.Modelclasses.ApplicationUser;
 import com.Modelclasses.PasswordSecurity;
 
@@ -13,8 +15,8 @@ import java.net.Socket;
 public class UserHandler implements Runnable, Serializable
 {
     private final Socket SOCKET;
-    private final ObjectInputStream IN;
-    private final ObjectOutputStream OUT;
+    private final ObjectInputStream IN = null;
+    private final ObjectOutputStream OUT = null;
     private boolean connected;
 
     /**
@@ -25,10 +27,9 @@ public class UserHandler implements Runnable, Serializable
     public UserHandler(Socket socket) throws IOException
     {
         this.SOCKET = socket;
-        this.IN = new ObjectInputStream(socket.getInputStream());
-        this.OUT = new ObjectOutputStream(socket.getOutputStream());
+//        this.IN = new ObjectInputStream(socket.getInputStream());
+//        this.OUT = new ObjectOutputStream(socket.getOutputStream());
     }
-
     //region Setters & Getters
 
     /**
@@ -74,35 +75,35 @@ public class UserHandler implements Runnable, Serializable
     @Override
     public void run()
     {
-        this.connected = true;
-        while(this.connected)
-        {
-            try
-            {
-                ApplicationUser user = (ApplicationUser) this.IN.readObject();
-                //registerNewUser(user);
-                boolean result = loginAttempt(user);
-
-                if(result)
-                {
-                    System.out.println("Login Successful, have fun!");
-                    this.connected = false;
-                    this.SOCKET.close();
-                }
-                else
-                {
-                    this.connected = false;
-                    this.SOCKET.close();
-                }
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e)
-            {
-                e.printStackTrace();
-            }
-        }
+//        this.connected = true;
+//        while(this.connected)
+//        {
+//            try
+//            {
+//                ApplicationUser user = (ApplicationUser) this.IN.readObject();
+//                //registerNewUser(user);
+//                boolean result = loginAttempt(user);
+//
+//                if(result)
+//                {
+//                    System.out.println("Login Successful, have fun!");
+//                    this.connected = false;
+//                    this.SOCKET.close();
+//                }
+//                else
+//                {
+//                    this.connected = false;
+//                    this.SOCKET.close();
+//                }
+//            }
+//            catch (IOException e)
+//            {
+//                e.printStackTrace();
+//            } catch (ClassNotFoundException e)
+//            {
+//                e.printStackTrace();
+//            }
+//        }
     }
 
     /**
@@ -116,21 +117,16 @@ public class UserHandler implements Runnable, Serializable
         System.out.println("Register Complete");
     }
 
+
     /**
      * Testing function for "a login attempt" over the socket, will change soon
      * @param user
      */
-    private boolean loginAttempt(ApplicationUser user)
+    public boolean loginAttempt(ApplicationUser user)
     {
-        //should try to get password, email and salt from the DB and put in a object for comparison
-        String pw = user.getPassword();
-        PasswordSecurity.hashPassword(user);
-        ApplicationUser test = new ApplicationUser(1, user.getEmail(), user.getPassword(), user.getSalt());
-        user.setPassword(pw);
-        //End temporary code for testing
+        ApplicationUser dbUser = DBhandlerSingleton.getInstance().getUser(user.getEmail());
 
-        boolean result = PasswordSecurity.authenticate(user, test);
-        if(result)
+        if(PasswordSecurity.authenticate(user, dbUser))
         {
             System.out.println("Login Successful");
             return true;
