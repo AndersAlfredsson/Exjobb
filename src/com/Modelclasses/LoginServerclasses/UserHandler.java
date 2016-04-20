@@ -1,7 +1,7 @@
 package com.Modelclasses.LoginServerclasses;
 
-import com.DBcommunication.ApplicationUserDAOimpl;
 import com.DBcommunication.DBhandlerSingleton;
+import com.Enums.LogEvents;
 import com.Modelclasses.ApplicationUser;
 import com.Modelclasses.PasswordSecurity;
 
@@ -129,11 +129,13 @@ public class UserHandler implements Runnable, Serializable
         if(PasswordSecurity.authenticate(user, dbUser))
         {
             System.out.println("Login Successful");
+            DBhandlerSingleton.getInstance().log(LogEvents.SuccessfulLoginAttempt, user);
             return true;
         }
         else
         {
             System.out.println("Login unsuccessful");
+            DBhandlerSingleton.getInstance().log(LogEvents.UnsuccessfulLoginAttempt, user);
             return false;
         }
     }

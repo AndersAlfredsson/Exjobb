@@ -19,10 +19,6 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
 
     }
 
-
-
-
-
     @Override
     public List<ApplicationUser> getAllUsers() {
         try {
@@ -91,7 +87,14 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
             PreparedStatement preparedStatement =  DBhandlerSingleton.getInstance().getConnection().prepareStatement("UPDATE Users SET Password = ? WHERE Email = ?;");
             preparedStatement.setString(1, user.getPassword());
             preparedStatement.setString(2, user.getEmail());
-            preparedStatement.executeUpdate();
+            if (preparedStatement.executeUpdate() == 0){
+                System.out.println("Trollololo");
+            }
+            else {
+                DBhandlerSingleton.getInstance().log(LogEvents.Insert, user);
+                System.out.println("log");
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -106,16 +109,19 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
         try {
             PreparedStatement preparedStatement =  DBhandlerSingleton.getInstance().getConnection().prepareStatement("DELETE FROM Users WHERE Email = ?;");
             preparedStatement.setString(1, user.getEmail());
-            preparedStatement.executeUpdate();
+            if (preparedStatement.executeUpdate() == 0){
+                System.out.println("Trollololo");
+            }
+            else {
+                DBhandlerSingleton.getInstance().log(LogEvents.Insert, user);
+                System.out.println("log");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-
-
     /**
-
      * Inserts a user into the database.
      * @param user
      */

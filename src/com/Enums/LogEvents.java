@@ -6,5 +6,7 @@ package com.Enums;
 public enum LogEvents {
         Login,
         Delete,
+        SuccessfulLoginAttempt,
+        UnsuccessfulLoginAttempt,
         Insert
 }
