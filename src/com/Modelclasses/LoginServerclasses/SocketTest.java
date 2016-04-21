@@ -26,15 +26,19 @@ public class SocketTest
         ApplicationUser user = new ApplicationUser("dev@dev.com", "dfdasev");
         boolean keepConnection = false;
         Socket s = null;
-        final ObjectInputStream IN;
         final ObjectOutputStream OUT;
+        final ObjectInputStream IN;
+
         try
         {
-            s = new Socket("127.0.0.1", 3000);
+            s = new Socket("localhost", 3000);
             OUT = new ObjectOutputStream(s.getOutputStream());
             IN = new ObjectInputStream(s.getInputStream());
+
             Thread.sleep(100);
+
             OUT.writeObject(new LoginMessage(user.getEmail(), user.getPassword()));
+
             ServerMessage message = (ServerMessage) IN.readObject();
 
             if(message.getMessageType() == ServerMessageType.Disconnect)

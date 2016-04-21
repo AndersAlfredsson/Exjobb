@@ -6,6 +6,7 @@ import com.Enums.ServerMessageType;
 import com.Modelclasses.ApplicationUser;
 import com.Modelclasses.NetworkMessages.LoginMessage;
 import com.Modelclasses.NetworkMessages.Message;
+import com.Modelclasses.NetworkMessages.RegisterMessage;
 import com.Modelclasses.NetworkMessages.ServerMessage;
 import com.Modelclasses.PasswordSecurity;
 
@@ -113,14 +114,33 @@ public class UserHandler implements Runnable, Serializable
         {
             System.out.println("LoginMessage");
             user = new ApplicationUser(message.getUsername(), ((LoginMessage) message).getPassword());
+
             this.authenticated = this.loginAttempt(user);
+
             if(!this.authenticated)
             {
                 String reason = "Wrong username or password";
-                Disconnect(reason);
+                disconnect(reason);
+            }
+            else
+            {
+                sendMessage(new ServerMessage(ServerMessageType.Authenticated, "Login Successful"));
             }
         }
-        //else if(message instanceof )
+        else if(message instanceof RegisterMessage)
+        {
+            System.out.println("RegisterMessage");
+            user = new ApplicationUser(message.getUsername(), message.getUsername());
+            //register and get boolean if username is valid
+
+            boolean validUsername = registerNewUser(user);
+            if(!validUsername)
+            {
+
+            }
+
+
+        }
     }
 
     /**
@@ -146,7 +166,7 @@ public class UserHandler implements Runnable, Serializable
      * Disconnects a client from the server by sending a disconnect to the client
      * @return
      */
-    private boolean Disconnect(String reason)
+    private boolean disconnect(String reason)
     {
         try
         {
@@ -168,11 +188,14 @@ public class UserHandler implements Runnable, Serializable
      * Testing function for "registering an account" over the socket, will change soon
      * @param user
      */
-    private void registerNewUser(ApplicationUser user)
+    private boolean registerNewUser(ApplicationUser user)
     {
         PasswordSecurity.hashPassword(user);
         System.out.println(user.getPassword());
         System.out.println("Register Complete");
+
+        //TODO should get true or false from DB if successful
+        return true;
     }
 
 
