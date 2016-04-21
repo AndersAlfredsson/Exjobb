@@ -1,4 +1,4 @@
-package com.exjobbandroidapplication;
+package com.ExjobbAndroidApplication;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;

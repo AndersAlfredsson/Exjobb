@@ -1,4 +1,4 @@
-package com.exjobbandroidapplication;
+package com.ExjobbAndroidApplication;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
