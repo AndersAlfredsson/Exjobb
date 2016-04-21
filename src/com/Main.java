@@ -14,8 +14,8 @@ import java.util.concurrent.Executor;
 public class Main {
 
     public static void main(String[] args) {
-        ApplicationUser user = new ApplicationUser(2,"Logtestarensbrorskompis@a.com", "TAYjnTP", "");
-        DBhandlerSingleton.getInstance().insertUser(user);
+        //ApplicationUser user = new ApplicationUser("dev@dev.com", "dev");
+        //DBhandlerSingleton.getInstance().insertUser(user);
         //ApplicationUser DbUser = new ApplicationUser(2, "Logtestaren@a.com", user.getPassword(), user.getSalt());
         //user.setPassword("TAYTO");
 //        try {
@@ -31,12 +31,12 @@ public class Main {
         //testdao.updateUser(user);
 
 
-//        try
-//        {
-//            (new Thread(new LoginServer(12, 3000))).start();
-//        }
-//        catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try
+        {
+            (new Thread(new LoginServer(12, 3000))).start();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

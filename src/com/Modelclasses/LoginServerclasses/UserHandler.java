@@ -2,7 +2,11 @@ package com.Modelclasses.LoginServerclasses;
 
 import com.DBcommunication.DBhandlerSingleton;
 import com.Enums.LogEvents;
+import com.Enums.ServerMessageType;
 import com.Modelclasses.ApplicationUser;
+import com.Modelclasses.NetworkMessages.LoginMessage;
+import com.Modelclasses.NetworkMessages.Message;
+import com.Modelclasses.NetworkMessages.ServerMessage;
 import com.Modelclasses.PasswordSecurity;
 
 import java.io.*;
@@ -15,9 +19,10 @@ import java.net.Socket;
 public class UserHandler implements Runnable, Serializable
 {
     private final Socket SOCKET;
-    private final ObjectInputStream IN = null;
-    private final ObjectOutputStream OUT = null;
+    private final ObjectInputStream IN;
+    private final ObjectOutputStream OUT;
     private boolean connected;
+    private boolean authenticated;
 
     /**
      * Constructor that sets up the connection and the I/O-ObjectStreams
@@ -27,11 +32,13 @@ public class UserHandler implements Runnable, Serializable
     public UserHandler(Socket socket) throws IOException
     {
         this.SOCKET = socket;
-//        this.IN = new ObjectInputStream(socket.getInputStream());
-//        this.OUT = new ObjectOutputStream(socket.getOutputStream());
+        this.IN = new ObjectInputStream(socket.getInputStream());
+        this.OUT = new ObjectOutputStream(socket.getOutputStream());
+        this.connected = false;
+        this.authenticated = false;
     }
-    //region Setters & Getters
 
+    //region Setters & Getters
     /**
      * Gets the ObjectOutputStream
      * @return
@@ -69,41 +76,92 @@ public class UserHandler implements Runnable, Serializable
     }
     //endregion
 
+
     /**
      * The threaded, overridden run-function that handles the communication with the client
      */
     @Override
     public void run()
     {
-//        this.connected = true;
-//        while(this.connected)
-//        {
-//            try
-//            {
-//                ApplicationUser user = (ApplicationUser) this.IN.readObject();
-//                //registerNewUser(user);
-//                boolean result = loginAttempt(user);
-//
-//                if(result)
-//                {
-//                    System.out.println("Login Successful, have fun!");
-//                    this.connected = false;
-//                    this.SOCKET.close();
-//                }
-//                else
-//                {
-//                    this.connected = false;
-//                    this.SOCKET.close();
-//                }
-//            }
-//            catch (IOException e)
-//            {
-//                e.printStackTrace();
-//            } catch (ClassNotFoundException e)
-//            {
-//                e.printStackTrace();
-//            }
-//        }
+        this.connected = true;
+        System.out.println("Client connected...");
+        while(this.connected)
+        {
+            try
+            {
+                Message m = (Message) this.IN.readObject();
+                handleMessage(m);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Checks what instance the message is of and then acts accordingly
+     * @param message
+     */
+    private void handleMessage(Message message)
+    {
+        ApplicationUser user;
+        if(message instanceof LoginMessage)
+        {
+            System.out.println("LoginMessage");
+            user = new ApplicationUser(message.getUsername(), ((LoginMessage) message).getPassword());
+            this.authenticated = this.loginAttempt(user);
+            if(!this.authenticated)
+            {
+                String reason = "Wrong username or password";
+                Disconnect(reason);
+            }
+        }
+        //else if(message instanceof )
+    }
+
+    /**
+     * Sends a message to the client
+     * @param message
+     */
+    private void sendMessage(ServerMessage message)
+    {
+        if(this.connected)
+        {
+            try
+            {
+                this.OUT.writeObject(message);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Disconnects a client from the server by sending a disconnect to the client
+     * @return
+     */
+    private boolean Disconnect(String reason)
+    {
+        try
+        {
+            sendMessage(new ServerMessage(ServerMessageType.Disconnect, reason));
+            this.OUT.flush();
+            this.SOCKET.close();
+            this.connected = false;
+            this.authenticated = false;
+            return true;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
