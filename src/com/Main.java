@@ -1,15 +1,8 @@
 package com;
 
-import com.DBcommunication.ApplicationUserDAOimpl;
-import com.DBcommunication.DBhandlerSingleton;
-import com.Modelclasses.ApplicationUser;
 import com.Modelclasses.LoginServerclasses.LoginServer;
-import com.Modelclasses.LoginServerclasses.UserHandler;
-import com.Modelclasses.PasswordSecurity;
 
 import java.io.IOException;
-import java.net.Socket;
-import java.util.concurrent.Executor;
 
 public class Main {
 
@@ -33,7 +26,7 @@ public class Main {
 
         try
         {
-            (new Thread(new LoginServer(12, 3000))).start();
+            (new Thread(new LoginServer(12, 9058))).start();
         }
         catch (IOException e) {
             e.printStackTrace();

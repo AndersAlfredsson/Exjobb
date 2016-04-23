@@ -1,9 +1,9 @@
 package com.Modelclasses.LoginServerclasses;
 
-import com.Enums.ServerMessageType;
+import Enums.ServerMessageType;
+import NetworkMessages.RegisterMessage;
+import NetworkMessages.ServerMessage;
 import com.Modelclasses.ApplicationUser;
-import com.Modelclasses.NetworkMessages.LoginMessage;
-import com.Modelclasses.NetworkMessages.ServerMessage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -23,21 +23,23 @@ public class SocketTest
 
     public static void Connect()
     {
-        ApplicationUser user = new ApplicationUser("dev@dev.com", "dfdasev");
-        boolean keepConnection = false;
+        ApplicationUser user = new ApplicationUser("test1@dev.com", "dev");
+        boolean keepConnection = true;
         Socket s = null;
         final ObjectOutputStream OUT;
         final ObjectInputStream IN;
 
         try
         {
-            s = new Socket("localhost", 3000);
+            s = new Socket("localhost", 9058);
+
+            //IMPORTANT ORDER!
             OUT = new ObjectOutputStream(s.getOutputStream());
             IN = new ObjectInputStream(s.getInputStream());
 
             Thread.sleep(100);
 
-            OUT.writeObject(new LoginMessage(user.getEmail(), user.getPassword()));
+            OUT.writeObject(new RegisterMessage(user.getEmail(), user.getPassword()));
 
             ServerMessage message = (ServerMessage) IN.readObject();
 
@@ -48,8 +50,15 @@ public class SocketTest
                 s.close();
                 keepConnection = false;
             }
+            else if(message.getMessageType() == ServerMessageType.Authenticated)
+            {
+                System.out.println(message.getMessage());
+                keepConnection = true;
+            }
             while(keepConnection)
             {
+                message = (ServerMessage) IN.readObject();
+                System.out.println(message.getMessage());
                 System.out.println("Still connected");
                 Thread.sleep(10000);
             }

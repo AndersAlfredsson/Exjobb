@@ -1,16 +1,19 @@
 package com.Modelclasses.LoginServerclasses;
 
+import Enums.ServerMessageType;
+import NetworkMessages.LoginMessage;
+import NetworkMessages.Message;
+import NetworkMessages.RegisterMessage;
+import NetworkMessages.ServerMessage;
 import com.DBcommunication.DBhandlerSingleton;
 import com.Enums.LogEvents;
-import com.Enums.ServerMessageType;
 import com.Modelclasses.ApplicationUser;
-import com.Modelclasses.NetworkMessages.LoginMessage;
-import com.Modelclasses.NetworkMessages.Message;
-import com.Modelclasses.NetworkMessages.RegisterMessage;
-import com.Modelclasses.NetworkMessages.ServerMessage;
 import com.Modelclasses.PasswordSecurity;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 
 /**
@@ -96,7 +99,8 @@ public class UserHandler implements Runnable, Serializable
             catch (IOException e)
             {
                 e.printStackTrace();
-            } catch (ClassNotFoundException e)
+            }
+            catch (ClassNotFoundException e)
             {
                 e.printStackTrace();
             }
@@ -131,15 +135,16 @@ public class UserHandler implements Runnable, Serializable
         {
             System.out.println("RegisterMessage");
             user = new ApplicationUser(message.getUsername(), message.getUsername());
-            //register and get boolean if username is valid
 
-            boolean validUsername = registerNewUser(user);
-            if(!validUsername)
+            this.authenticated = registerNewUser(user);
+            if(!this.authenticated)
             {
-
+                disconnect("Email already in use");
             }
-
-
+            else
+            {
+                sendMessage(new ServerMessage(ServerMessageType.Authenticated, "Register & Login Successful"));
+            }
         }
     }
 
@@ -190,12 +195,15 @@ public class UserHandler implements Runnable, Serializable
      */
     private boolean registerNewUser(ApplicationUser user)
     {
-        PasswordSecurity.hashPassword(user);
-        System.out.println(user.getPassword());
-        System.out.println("Register Complete");
-
-        //TODO should get true or false from DB if successful
-        return true;
+        if(DBhandlerSingleton.getInstance().getUser(user.getEmail()) == null) //TODO något är fel här
+        {
+            PasswordSecurity.hashPassword(user);
+            DBhandlerSingleton.getInstance().insertUser(user);
+            System.out.println("Register Complete");
+            return true;
+        }
+        System.out.println("Register not possible");
+        return false;
     }
 
 
