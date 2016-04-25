@@ -3,7 +3,6 @@ package com.Modelclasses.LoginServerclasses;
 import Enums.ServerMessageType;
 import NetworkMessages.DisconnectMessage;
 import NetworkMessages.LoginMessage;
-import NetworkMessages.RegisterMessage;
 import NetworkMessages.ServerMessage;
 import com.Modelclasses.ApplicationUser;
 

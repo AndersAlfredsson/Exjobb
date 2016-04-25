@@ -96,6 +96,12 @@ public class UserHandler implements Runnable, Serializable
             catch (IOException e)
             {
                 e.printStackTrace();
+                this.connected = false;
+                try {
+                    this.SOCKET.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
             }
             catch (ClassNotFoundException e)
             {
