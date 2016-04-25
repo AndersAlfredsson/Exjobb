@@ -9,5 +9,6 @@ public enum LogEvents {
         Delete,
         SuccessfulLoginAttempt,
         UnsuccessfulLoginAttempt,
-        Insert
+        Insert,
+        Disconnect
 }

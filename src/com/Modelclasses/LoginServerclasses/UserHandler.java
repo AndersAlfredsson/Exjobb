@@ -1,10 +1,7 @@
 package com.Modelclasses.LoginServerclasses;
 
 import Enums.ServerMessageType;
-import NetworkMessages.LoginMessage;
-import NetworkMessages.Message;
-import NetworkMessages.RegisterMessage;
-import NetworkMessages.ServerMessage;
+import NetworkMessages.*;
 import com.DBcommunication.DBhandlerSingleton;
 import com.Enums.LogEvents;
 import com.Modelclasses.ApplicationUser;
@@ -145,6 +142,12 @@ public class UserHandler implements Runnable, Serializable
             {
                 sendMessage(new ServerMessage(ServerMessageType.Authenticated, "Register & Login Successful"));
             }
+        }
+        else if(message instanceof DisconnectMessage)
+        {
+            System.out.println("Disconnectmessage");
+            DBhandlerSingleton.getInstance().log(LogEvents.Disconnect, new ApplicationUser(message.getUsername(), null));
+            disconnect("Disconnect request");
         }
     }
 

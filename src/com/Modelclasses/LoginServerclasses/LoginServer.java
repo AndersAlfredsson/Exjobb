@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Gustav on 2016-04-18.
  * Class for handling connections for users with the help of an ExecutorService
- * and executors. Also using a ServerSocket for startin communications with the clients
+ * and executors. Also using a ServerSocket for starting communications with the clients
  */
 public class LoginServer implements Runnable
 {

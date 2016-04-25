@@ -1,10 +1,13 @@
 package com.Modelclasses.LoginServerclasses;
 
 import Enums.ServerMessageType;
+import NetworkMessages.DisconnectMessage;
+import NetworkMessages.LoginMessage;
 import NetworkMessages.RegisterMessage;
 import NetworkMessages.ServerMessage;
 import com.Modelclasses.ApplicationUser;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -23,7 +26,7 @@ public class SocketTest
 
     public static void Connect()
     {
-        ApplicationUser user = new ApplicationUser("test1@dev.com", "dev");
+        ApplicationUser user = new ApplicationUser("dev@dev.com", "dev");
         boolean keepConnection = true;
         Socket s = null;
         final ObjectOutputStream OUT;
@@ -39,7 +42,7 @@ public class SocketTest
 
             Thread.sleep(100);
 
-            OUT.writeObject(new RegisterMessage(user.getEmail(), user.getPassword()));
+            OUT.writeObject(new LoginMessage(user.getEmail(), user.getPassword()));
 
             ServerMessage message = (ServerMessage) IN.readObject();
 
@@ -57,10 +60,20 @@ public class SocketTest
             }
             while(keepConnection)
             {
-                message = (ServerMessage) IN.readObject();
-                System.out.println(message.getMessage());
                 System.out.println("Still connected");
+
                 Thread.sleep(10000);
+                System.out.println("Trying to disconnect");
+                OUT.writeObject(new DisconnectMessage(user.getEmail()));
+                message = (ServerMessage) IN.readObject();
+                if(message.getMessageType() == ServerMessageType.Disconnect)
+                {
+                    System.out.println(message.getMessage());
+                    OUT.flush();
+                    s.close();
+                    keepConnection = false;
+                }
+
             }
         }
         catch (IOException e)
