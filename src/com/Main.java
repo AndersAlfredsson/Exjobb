@@ -1,8 +1,13 @@
 package com;
 
+import NetworkMessages.GPSCoordMessage;
+import com.Modelclasses.Dataclasses.GpsDataHandler;
 import com.Modelclasses.LoginServerclasses.LoginServer;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Main {
 

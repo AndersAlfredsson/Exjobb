@@ -17,7 +17,6 @@ import java.net.Socket;
  */
 public class SocketTest
 {
-
     public static void main(String[] args)
     {
         Connect();
@@ -33,7 +32,7 @@ public class SocketTest
 
         try
         {
-            s = new Socket("localhost", 9058);
+            s = new Socket("10.22.1.48", 9058);
 
             //IMPORTANT ORDER!
             OUT = new ObjectOutputStream(s.getOutputStream());
