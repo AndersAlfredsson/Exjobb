@@ -30,4 +30,14 @@ public class inputCheck {
         //TODO: Ändra till längre lösenord.
         return password.length() > 2;
     }
+
+    /**
+     * Checks if two passwords are matching
+     * @param password1
+     * @param password2
+     * @return
+     */
+    public static boolean arePasswordsMatching(String password1, String password2){
+        return password1.equals(password2);
+    }
 }

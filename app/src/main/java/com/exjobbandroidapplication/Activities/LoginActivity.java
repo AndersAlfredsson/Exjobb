@@ -3,6 +3,7 @@ package com.exjobbandroidapplication.Activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -30,6 +31,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.exjobbandroidapplication.Network.ConnectionHandler;
 import com.exjobbandroidapplication.R;
@@ -38,7 +40,10 @@ import com.exjobbandroidapplication.Resources.inputCheck;
 import java.util.ArrayList;
 import java.util.List;
 
+import Enums.ServerMessageType;
 import NetworkMessages.LoginMessage;
+import NetworkMessages.RegisterMessage;
+import NetworkMessages.ServerMessage;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -65,16 +70,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private boolean registrationMode = false;
     private Button mEmailSignInButton;
+    private LoginActivity loginActivity = this;
 
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        ConnectionHandler.getInstance();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        populateAutoComplete();
+        //populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -108,45 +115,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
     });
 
-//        regButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                attemptRegister();
-//            }
-//        });
-
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-    }
-
-    private void populateAutoComplete() {
-        if (!mayRequestContacts()) {
-            return;
-        }
-
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    private boolean mayRequestContacts() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true;
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok, new View.OnClickListener() {
-                        @Override
-                        @TargetApi(Build.VERSION_CODES.M)
-                        public void onClick(View v) {
-                            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-                        }
-                    });
-        } else {
-            requestPermissions(new String[]{READ_CONTACTS}, REQUEST_READ_CONTACTS);
-        }
-        return false;
     }
 
     /**
@@ -155,26 +125,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
-            }
-        }
     }
 
     private void registrationPressed() {
 //        Intent registerIntent = new Intent(this.getBaseContext(), RegisterActivity.class);
 //        startActivity(registerIntent);
         if (registrationMode) {
-            registrationMode = false;
-            mEmailSignInButton.setVisibility(View.GONE);
+            attemptLogin();
+// mAuthTask = new UserLoginTask(mEmailView.getText().toString(), mPasswordView.getText().toString());
+//            mAuthTask.execute((Void) null);
+//            Log.d("sda ", "knapp tryckt igen");
+//            //Logga in
         }
         else {
             registrationMode = true;
+            mEmailSignInButton.setVisibility(View.GONE);
             mPasswordrepeatView.setVisibility(View.VISIBLE);
         }
-
-
     }
 
     private void showLogin() {
@@ -185,16 +152,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     }
 
-    private void attemptRegister(){
-        String eMail = mEmailView.getText().toString();
-        Log.d("Email: ", eMail);
-        String password = mPasswordView.getText().toString();
-        Log.d("Password: ", password);
-    }
-
-
     /**
-     * Attempts to sign in or register the account specified by the login form.
+     * Attempts to sign in the account specified by the login form.
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
@@ -206,16 +165,18 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
+        mPasswordrepeatView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
-        String password = mPasswordView.getText().toString();
+        String password1 = mPasswordView.getText().toString();
+        String password2 = mPasswordrepeatView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !inputCheck.isPasswordValid(password)) {
+        if (!TextUtils.isEmpty(password1) && !inputCheck.isPasswordValid(password1)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -232,6 +193,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             cancel = true;
         }
 
+        if (registrationMode) {
+            if (!inputCheck.arePasswordsMatching(password1, password2)){
+                mPasswordView.setError("Passwords are not matching");
+                focusView = mPasswordView;
+                cancel = true;
+            }
+        }
+
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -240,7 +209,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(email, password1);
             mAuthTask.execute((Void) null);
         }
     }
@@ -283,19 +252,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(this,
-                // Retrieve data rows for the device user's 'profile' contact.
-                Uri.withAppendedPath(ContactsContract.Profile.CONTENT_URI,
-                        ContactsContract.Contacts.Data.CONTENT_DIRECTORY), ProfileQuery.PROJECTION,
-
-                // Select only email addresses.
-                ContactsContract.Contacts.Data.MIMETYPE +
-                        " = ?", new String[]{ContactsContract.CommonDataKinds.Email
-                .CONTENT_ITEM_TYPE},
-
-                // Show primary email addresses first. Note that there won't be
-                // a primary email address if the user hasn't specified one.
-                ContactsContract.Contacts.Data.IS_PRIMARY + " DESC");
+        return null;
     }
 
     @Override
@@ -303,7 +260,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         List<String> emails = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            emails.add(cursor.getString(ProfileQuery.ADDRESS));
+            //emails.add(cursor.getString(ProfileQuery.ADDRESS));
             cursor.moveToNext();
         }
 
@@ -325,16 +282,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
 
-    private interface ProfileQuery {
-        String[] PROJECTION = {
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
-                ContactsContract.CommonDataKinds.Email.IS_PRIMARY,
-        };
-
-        int ADDRESS = 0;
-        int IS_PRIMARY = 1;
-    }
-
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -351,10 +298,41 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            ConnectionHandler.getInstance().seteMail(mEmail);
-            ConnectionHandler.getInstance().sendMessage(new LoginMessage(mEmail, mPassword));
+            ConnectionHandler.getInstance().connectToServer();
 
-            //Sent to onPostExecute.
+            if (registrationMode){
+                ConnectionHandler.getInstance().seteMail(mEmail);
+                final ServerMessage serverMessage = ConnectionHandler.getInstance().sendMessage(new RegisterMessage(mEmail, mPassword));
+                if (serverMessage.getMessageType() == ServerMessageType.Authenticated){
+                    registrationMode = false;
+                    return true;
+                }
+                else if (serverMessage.getMessageType() == ServerMessageType.Disconnect){
+                    loginActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final String message = serverMessage.getMessage();
+                            mEmailView.setError(message);
+                        }
+                    });
+                }
+            }
+            else {
+                ConnectionHandler.getInstance().seteMail(mEmail);
+                final ServerMessage serverMessage = ConnectionHandler.getInstance().sendMessage(new LoginMessage(mEmail, mPassword));
+                if (serverMessage.getMessageType() == ServerMessageType.Authenticated){
+                    return true;
+                }
+                else if (serverMessage.getMessageType() == ServerMessageType.Disconnect){
+                    loginActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            final String message = serverMessage.getMessage();
+                            mEmailView.setError(message);
+                        }
+                    });
+                }
+            }
             return false;
         }
 
@@ -366,8 +344,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-
-                finish();
+                //Gå till mapskärmen.
+                Intent mapActivityIntent = new Intent(getBaseContext(), CampusMapActivity.class);
+                startActivity(mapActivityIntent);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
@@ -381,49 +360,4 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 }
-
-//            Socket socket = null;
-//            ObjectOutputStream out = null;
-//            ObjectInputStream in = null;
-//
-//            boolean connected = false;
-
-//            try {
-//                socket = new Socket("10.22.19.147", 9058);
-//                out = new ObjectOutputStream(socket.getOutputStream());
-//                in = new ObjectInputStream(socket.getInputStream());
-//
-//                out.writeObject(new LoginMessage(mEmail, mPassword));
-//                try {
-//                    ServerMessage serverMessage = (ServerMessage) in.readObject();
-//                    if (serverMessage.getMessageType() == ServerMessageType.Authenticated){
-//                        connected = true;
-//                    }
-//                } catch (ClassNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//                while (connected) {
-//                    try {
-//                        ServerMessage serverMessage = (ServerMessage) in.readObject();
-//                        if (serverMessage.getMessageType() == ServerMessageType.Disconnect){
-//                            connected = false;
-//                        }
-//                    } catch (ClassNotFoundException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            } finally {
-//                if (out != null){
-//                    try {
-//                        out.writeObject(new DisconnectMessage(mEmail));
-//                        out.flush();
-//                        socket.close();
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
 
