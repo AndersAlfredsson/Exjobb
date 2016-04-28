@@ -111,9 +111,9 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
                 System.out.println("Trollololo");
             }
             else {
-                DBhandlerSingleton.getInstance().log(LogEvents.Insert, user);
-                System.out.println("log");
-            }
+            DBhandlerSingleton.getInstance().log(LogEvents.Insert, user);
+            System.out.println("log");
+        }
 
         } catch (SQLException e) {
             e.printStackTrace();

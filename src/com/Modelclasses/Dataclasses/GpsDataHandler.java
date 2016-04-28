@@ -119,6 +119,7 @@ public class GpsDataHandler
             this.lastUpdatedMinute = lastUpdated.getMinute();
         }
 
+        //region Getters and Setters
         public GPSCoordMessage getMessage() {
             return message;
         }
@@ -142,5 +143,6 @@ public class GpsDataHandler
         public void setLastUpdatedHour(int lastUpdatedHour) {
             this.lastUpdatedHour = lastUpdatedHour;
         }
+        //endregion
     }
 }

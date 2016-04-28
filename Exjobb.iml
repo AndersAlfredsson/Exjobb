@@ -27,6 +27,14 @@
       </library>
     </orderEntry>
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="NetworkingExjobb1.8_92" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../NetworkingExjobb/out/artifacts/NetworkingExjobb1_8_92_v1_0_jar/NetworkingExjobb_1.8_92.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

@@ -5,12 +5,10 @@ import NetworkMessages.*;
 import com.DBcommunication.DBhandlerSingleton;
 import com.Enums.LogEvents;
 import com.Modelclasses.ApplicationUser;
+import com.Modelclasses.Dataclasses.GpsDataHandler;
 import com.Modelclasses.PasswordSecurity;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.Socket;
 
 /**
@@ -24,6 +22,7 @@ public class UserHandler implements Runnable, Serializable
     private final ObjectOutputStream OUT;
     private boolean connected;
     private boolean authenticated;
+    private GpsDataHandler handler;
 
     /**
      * Constructor that sets up the connection and the I/O-ObjectStreams
@@ -37,6 +36,7 @@ public class UserHandler implements Runnable, Serializable
         this.OUT = new ObjectOutputStream(socket.getOutputStream());
         this.connected = false;
         this.authenticated = false;
+        this.handler = new GpsDataHandler();
     }
 
     //region Setters & Getters
@@ -97,9 +97,12 @@ public class UserHandler implements Runnable, Serializable
             {
                 e.printStackTrace();
                 this.connected = false;
-                try {
+                try
+                {
                     this.SOCKET.close();
-                } catch (IOException e1) {
+                }
+                catch (IOException e1)
+                {
                     e1.printStackTrace();
                 }
             }
@@ -126,8 +129,7 @@ public class UserHandler implements Runnable, Serializable
 
             if(!this.authenticated)
             {
-                String reason = "Wrong username or password";
-                disconnect(reason);
+                disconnect("Wrong username or password");
             }
             else
             {
@@ -151,9 +153,17 @@ public class UserHandler implements Runnable, Serializable
         }
         else if(message instanceof DisconnectMessage)
         {
-            System.out.println("Disconnectmessage");
+            System.out.println("DisconnectMessage");
             DBhandlerSingleton.getInstance().log(LogEvents.Disconnect, new ApplicationUser(message.getUsername(), null));
             disconnect("Disconnect request");
+        }
+        else if(message instanceof RequestMessage)
+        {
+            System.out.println("RequestMessage");
+            GPSCoordMessage gpsCoords = ((RequestMessage) message).getGpsCoords();
+            handler.putData(gpsCoords);
+            handler.printMap();
+            sendMessage(new ServerMessage(ServerMessageType.SensorData, "Hello this is data"));
         }
     }
 
@@ -204,7 +214,7 @@ public class UserHandler implements Runnable, Serializable
      */
     private boolean registerNewUser(ApplicationUser user)
     {
-        if(DBhandlerSingleton.getInstance().getUser(user.getEmail()) == null) //TODO något är fel här
+        if(DBhandlerSingleton.getInstance().getUser(user.getEmail()) == null)
         {
             PasswordSecurity.hashPassword(user);
             DBhandlerSingleton.getInstance().insertUser(user);
@@ -224,11 +234,20 @@ public class UserHandler implements Runnable, Serializable
     {
         ApplicationUser dbUser = DBhandlerSingleton.getInstance().getUser(user.getEmail());
 
-        if(PasswordSecurity.authenticate(user, dbUser))
+        if(dbUser != null)
         {
-            System.out.println("Login Successful");
-            DBhandlerSingleton.getInstance().log(LogEvents.SuccessfulLoginAttempt, user);
-            return true;
+            if(PasswordSecurity.authenticate(user, dbUser))
+            {
+                System.out.println("Login Successful");
+                DBhandlerSingleton.getInstance().log(LogEvents.SuccessfulLoginAttempt, user);
+                return true;
+            }
+            else
+            {
+                System.out.println("Login unsuccessful");
+                DBhandlerSingleton.getInstance().log(LogEvents.UnsuccessfulLoginAttempt, user);
+                return false;
+            }
         }
         else
         {
@@ -236,5 +255,6 @@ public class UserHandler implements Runnable, Serializable
             DBhandlerSingleton.getInstance().log(LogEvents.UnsuccessfulLoginAttempt, user);
             return false;
         }
+
     }
 }
