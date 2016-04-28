@@ -1,4 +1,4 @@
-package com.ExjobbAndroidApplication;
+package com.exjobbandroidapplication;
 
 import org.junit.Test;
 

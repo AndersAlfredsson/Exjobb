@@ -1,4 +1,4 @@
-package com.exjobbandroidapplication;
+package com.exjobbandroidapplication.Activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -18,7 +18,9 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -29,17 +31,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.ExjobbAndroidApplication.R;
+import com.exjobbandroidapplication.Network.ConnectionHandler;
+import com.exjobbandroidapplication.R;
+import com.exjobbandroidapplication.Resources.inputCheck;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
 import NetworkMessages.LoginMessage;
-import NetworkMessages.ServerMessage;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
@@ -61,8 +60,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+    private EditText mPasswordrepeatView;
     private View mProgressView;
     private View mLoginFormView;
+    private boolean registrationMode = false;
+    private Button mEmailSignInButton;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,13 +88,32 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        mPasswordrepeatView = (EditText) findViewById(R.id.passwordrepeat);
+        mPasswordrepeatView.setVisibility(View.GONE);
+        Editable text = mPasswordrepeatView.getText();
+
+        mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
             }
         });
+
+        Button registerButton = (Button) findViewById(R.id.register_button);
+        registerButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                registrationPressed();
+            }
+    });
+
+//        regButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                attemptRegister();
+//            }
+//        });
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -139,6 +162,36 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
+    private void registrationPressed() {
+//        Intent registerIntent = new Intent(this.getBaseContext(), RegisterActivity.class);
+//        startActivity(registerIntent);
+        if (registrationMode) {
+            registrationMode = false;
+            mEmailSignInButton.setVisibility(View.GONE);
+        }
+        else {
+            registrationMode = true;
+            mPasswordrepeatView.setVisibility(View.VISIBLE);
+        }
+
+
+    }
+
+    private void showLogin() {
+
+    }
+
+    private void showRegistration() {
+
+    }
+
+    private void attemptRegister(){
+        String eMail = mEmailView.getText().toString();
+        Log.d("Email: ", eMail);
+        String password = mPasswordView.getText().toString();
+        Log.d("Password: ", password);
+    }
+
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -162,7 +215,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
+        if (!TextUtils.isEmpty(password) && !inputCheck.isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
@@ -173,7 +226,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mEmailView.setError(getString(R.string.error_field_required));
             focusView = mEmailView;
             cancel = true;
-        } else if (!isEmailValid(email)) {
+        } else if (!inputCheck.isEmailValid(email)) {
             mEmailView.setError(getString(R.string.error_invalid_email));
             focusView = mEmailView;
             cancel = true;
@@ -190,16 +243,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
     }
 
     /**
@@ -308,29 +351,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            Socket socket = null;
-            try {
-                socket = new Socket("10.22.5.224", 9058);
-                ObjectOutputStream OUT = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream IN = new ObjectInputStream(socket.getInputStream());
+            ConnectionHandler.getInstance().seteMail(mEmail);
+            ConnectionHandler.getInstance().sendMessage(new LoginMessage(mEmail, mPassword));
 
-                OUT.writeObject(new LoginMessage("dev@dev.com", "dev"));
-
-                try {
-                    ServerMessage serverMessage =(ServerMessage)IN.readObject();
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            // TODO: register the new account here.
-            return true;
+            //Sent to onPostExecute.
+            return false;
         }
+
+
 
         @Override
         protected void onPostExecute(final Boolean success) {
@@ -338,6 +366,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
+
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
@@ -352,4 +381,49 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 }
+
+//            Socket socket = null;
+//            ObjectOutputStream out = null;
+//            ObjectInputStream in = null;
+//
+//            boolean connected = false;
+
+//            try {
+//                socket = new Socket("10.22.19.147", 9058);
+//                out = new ObjectOutputStream(socket.getOutputStream());
+//                in = new ObjectInputStream(socket.getInputStream());
+//
+//                out.writeObject(new LoginMessage(mEmail, mPassword));
+//                try {
+//                    ServerMessage serverMessage = (ServerMessage) in.readObject();
+//                    if (serverMessage.getMessageType() == ServerMessageType.Authenticated){
+//                        connected = true;
+//                    }
+//                } catch (ClassNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//                while (connected) {
+//                    try {
+//                        ServerMessage serverMessage = (ServerMessage) in.readObject();
+//                        if (serverMessage.getMessageType() == ServerMessageType.Disconnect){
+//                            connected = false;
+//                        }
+//                    } catch (ClassNotFoundException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            } finally {
+//                if (out != null){
+//                    try {
+//                        out.writeObject(new DisconnectMessage(mEmail));
+//                        out.flush();
+//                        socket.close();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
 
