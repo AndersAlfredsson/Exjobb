@@ -94,7 +94,7 @@ public class DBhandlerSingleton {
      * Calls the insertUser in the ApplicationUser class if the connection is valid.
      * @param user
      */
-    public void insertUser(ApplicationUser user){
+    public synchronized void insertUser(ApplicationUser user){
         if (checkConnection()){
             applicationUserDAOimpl.insertUser(user);
         }
@@ -104,7 +104,7 @@ public class DBhandlerSingleton {
      * Calls the updateUser in the ApplicationUser class if the connection is valid.
      * @param user
      */
-    public void updateUser(ApplicationUser user){
+    public synchronized void updateUser(ApplicationUser user){
         if (checkConnection()){
             applicationUserDAOimpl.deleteUser(user);
         }
@@ -114,7 +114,7 @@ public class DBhandlerSingleton {
      * Calls the deleteUser in the ApplicationUser class if the connection is valid.
      * @param user to be deleted.
      */
-    public void deleteUser(ApplicationUser user){
+    public synchronized void deleteUser(ApplicationUser user){
         if (checkConnection()){
             applicationUserDAOimpl.updateUser(user);
         }
@@ -124,7 +124,7 @@ public class DBhandlerSingleton {
      * Calls the getAllUsers in the ApplicationUser class if the connection is valid.
      * @return returns all users in the database.
      */
-    public List<ApplicationUser> getAllUsers(){
+    public synchronized List<ApplicationUser> getAllUsers(){
         List<ApplicationUser> userList = null;
         if (checkConnection()){
              userList = applicationUserDAOimpl.getAllUsers();
@@ -137,7 +137,7 @@ public class DBhandlerSingleton {
      * @param email
      * @return the user with the matching email.
      */
-    public ApplicationUser getUser(String email){
+    public synchronized ApplicationUser getUser(String email){
         ApplicationUser user = null;
         if (checkConnection()){
             user = applicationUserDAOimpl.getUser(email);
@@ -150,7 +150,7 @@ public class DBhandlerSingleton {
      * @param event
      * @param user
      */
-    public void log(LogEvents event, ApplicationUser user){
+    public synchronized void log(LogEvents event, ApplicationUser user){
         if (checkConnection()){
             logger.logEvent(event, user);
         }

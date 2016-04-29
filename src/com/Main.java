@@ -1,13 +1,10 @@
 package com;
 
-import NetworkMessages.GPSCoordMessage;
 import com.Modelclasses.Dataclasses.GpsDataHandler;
-import com.Modelclasses.LoginServerclasses.LoginServer;
+import com.Modelclasses.Serverclasses.LoginServer;
+import com.Modelclasses.Serverclasses.Server;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 public class Main {
 
@@ -28,13 +25,8 @@ public class Main {
         //user.setPassword("nyttpassword");
         //testdao.updateUser(user);
 
+        Server server = new Server();
+        server.startServer();
 
-        try
-        {
-            (new Thread(new LoginServer(12, 9058))).start();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

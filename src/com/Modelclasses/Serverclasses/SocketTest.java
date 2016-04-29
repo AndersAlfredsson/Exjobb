@@ -1,12 +1,9 @@
-package com.Modelclasses.LoginServerclasses;
+package com.Modelclasses.Serverclasses;
 
 import Enums.ServerMessageType;
-import NetworkMessages.DisconnectMessage;
-import NetworkMessages.LoginMessage;
-import NetworkMessages.ServerMessage;
+import NetworkMessages.*;
 import com.Modelclasses.ApplicationUser;
 
-import java.awt.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -32,7 +29,7 @@ public class SocketTest
 
         try
         {
-            s = new Socket("10.22.1.48", 9058);
+            s = new Socket("localhost", 9058);
 
             //IMPORTANT ORDER!
             OUT = new ObjectOutputStream(s.getOutputStream());
@@ -59,7 +56,7 @@ public class SocketTest
             while(keepConnection)
             {
                 System.out.println("Still connected");
-
+                OUT.writeObject(new RequestMessage(user.getEmail(), new GPSCoordMessage(user.getEmail(), 1.0, 1.0)));
                 Thread.sleep(10000);
                 System.out.println("Trying to disconnect");
                 OUT.writeObject(new DisconnectMessage(user.getEmail()));

@@ -27,17 +27,18 @@ public class GpsDataHandler
      * if it is, it removes the object first and then adds the new one.
      * @param message
      */
-    public void putData(GPSCoordMessage message)
+    public synchronized void putData(GPSCoordMessage message)
     {
         GpsDataContainer container = new GpsDataContainer(message, ZonedDateTime.now());
         if(dataMap.containsKey(message.getUsername()))
         {
+            System.out.println("Replaced data in map");
             dataMap.remove(message.getUsername());
             dataMap.put(message.getUsername(), container);
-
         }
         else
         {
+            System.out.println("Put data in map");
             dataMap.put(message.getUsername(), container);
         }
     }
@@ -63,14 +64,16 @@ public class GpsDataHandler
      * if timedifference >= TIMEDIFFERENCE which is thought to be 5-10 mins
      * but can change, it gets removed
      */
-    public void cleanup()
+    public synchronized void cleanup()
     {
+        System.out.println("Cleanup started...");
         HashMap<String, GpsDataContainer> copy = new HashMap<>(this.dataMap);
         final int TIMEDIFFERENCE = 5; //The max amount of timedifference before it gets removed
 
         Iterator it = copy.entrySet().iterator();
         int hour = ZonedDateTime.now().getHour();
         int minute = ZonedDateTime.now().getMinute();
+        int amountRemoved = 0;
         while(it.hasNext())
         {
             HashMap.Entry pair = (HashMap.Entry) it.next();
@@ -82,6 +85,7 @@ public class GpsDataHandler
                 {
                     //System.out.println("Old Data found with different hours");
                     this.dataMap.remove(m.getMessage().getUsername());
+                    amountRemoved++;
                 }
             }
             else if(hour == m.getLastUpdatedHour())
@@ -91,9 +95,44 @@ public class GpsDataHandler
                 {
                     //System.out.println("Old data found with same hour");
                     this.dataMap.remove(m.getMessage().getUsername());
+                    amountRemoved++;
                 }
             }
         }
+        System.out.println("Cleanup done with " + amountRemoved + " removed");
+    }
+
+    /**
+     * Threaded cleanup-function that calls the cleanup if the hashmap is not empty.
+     * @param interval
+     */
+    public void startCleanupThread(int interval)
+    {
+        long timeInterval = 1000 * 60 * interval; //minutes -> milliseconds
+
+        Thread cleanUpThread = new Thread(() -> {
+            while(true)
+            {
+                try
+                {
+                    if(this.dataMap.size() > 0)
+                    {
+                        cleanup();
+                    }
+                    else
+                    {
+                        System.out.println("Cleanup Skipped, map is empty");
+                    }
+                    Thread.sleep(timeInterval);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        cleanUpThread.setDaemon(true);
+        cleanUpThread.start();
     }
 
     /**'

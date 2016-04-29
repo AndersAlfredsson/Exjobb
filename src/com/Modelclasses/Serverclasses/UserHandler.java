@@ -1,4 +1,4 @@
-package com.Modelclasses.LoginServerclasses;
+package com.Modelclasses.Serverclasses;
 
 import Enums.ServerMessageType;
 import NetworkMessages.*;
@@ -29,14 +29,14 @@ public class UserHandler implements Runnable, Serializable
      * @param socket
      * @throws IOException
      */
-    public UserHandler(Socket socket) throws IOException
+    public UserHandler(Socket socket, GpsDataHandler handler) throws IOException
     {
         this.SOCKET = socket;
         this.IN = new ObjectInputStream(socket.getInputStream());
         this.OUT = new ObjectOutputStream(socket.getOutputStream());
         this.connected = false;
         this.authenticated = false;
-        this.handler = new GpsDataHandler();
+        this.handler = handler;
     }
 
     //region Setters & Getters
@@ -80,6 +80,7 @@ public class UserHandler implements Runnable, Serializable
 
     /**
      * The threaded, overridden run-function that handles the communication with the client
+     * it reads an object and then calls the handleMessage-function.
      */
     @Override
     public void run()
@@ -95,14 +96,16 @@ public class UserHandler implements Runnable, Serializable
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                //e.printStackTrace();
                 this.connected = false;
                 try
                 {
+                    System.out.println("Client closed connection without disconnect...");
                     this.SOCKET.close();
                 }
                 catch (IOException e1)
                 {
+
                     e1.printStackTrace();
                 }
             }
@@ -227,7 +230,9 @@ public class UserHandler implements Runnable, Serializable
 
 
     /**
-     * Testing function for "a login attempt" over the socket, will change soon
+     * Does a loginattempt by first checking if the user exists, if id does not, username is wrong
+     * otherwise it tries to hash password and salt the same way as the saved password, if they are not the same
+     * the password is wrong, otherwise it is a successful login and the client can continue
      * @param user
      */
     public boolean loginAttempt(ApplicationUser user)
