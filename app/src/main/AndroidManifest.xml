@@ -7,6 +7,12 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -27,7 +33,13 @@
             android:name=".Activities.CampusMapActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_campus_map"
-            android:theme="@style/FullscreenTheme"></activity>
+            android:theme="@style/FullscreenTheme" />
+        <activity
+            android:name=".Activities.OSMDROIDTESTACTIVITY"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_osmdroidtestactivity"
+            android:theme="@style/FullscreenTheme" />
+        <activity android:name=".Activities.osmtest"></activity>
     </application>
 
 </manifest>

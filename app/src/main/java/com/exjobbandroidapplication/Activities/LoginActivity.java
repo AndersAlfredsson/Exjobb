@@ -45,8 +45,6 @@ import NetworkMessages.LoginMessage;
 import NetworkMessages.RegisterMessage;
 import NetworkMessages.ServerMessage;
 
-import static android.Manifest.permission.READ_CONTACTS;
-
 /**
  * A login screen that offers login via email/password.
  */
@@ -128,14 +126,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private void registrationPressed() {
-//        Intent registerIntent = new Intent(this.getBaseContext(), RegisterActivity.class);
-//        startActivity(registerIntent);
         if (registrationMode) {
             attemptLogin();
-// mAuthTask = new UserLoginTask(mEmailView.getText().toString(), mPasswordView.getText().toString());
-//            mAuthTask.execute((Void) null);
-//            Log.d("sda ", "knapp tryckt igen");
-//            //Logga in
         }
         else {
             registrationMode = true;
@@ -336,8 +328,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             return false;
         }
 
-
-
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
@@ -345,8 +335,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             if (success) {
                 //Gå till mapskärmen.
-                Intent mapActivityIntent = new Intent(getBaseContext(), CampusMapActivity.class);
-                startActivity(mapActivityIntent);
+//                Intent mapActivityIntent = new Intent(loginActivity, CampusMapActivity.class);
+//                startActivity(mapActivityIntent);
+                Intent plupp = new Intent(loginActivity,osmtest.class);
+                startActivity(plupp);
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
