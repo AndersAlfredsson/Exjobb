@@ -14,6 +14,7 @@ public class GpsDataHandler
 {
     private HashMap<String, GpsDataContainer> dataMap;
     private boolean runCleanup;
+    private int messagesRecieved;
 
     /**
      * Default constructor
@@ -22,6 +23,7 @@ public class GpsDataHandler
     {
         this.dataMap = new HashMap<>();
         this.runCleanup = true;
+        this.messagesRecieved = 0;
     }
 
     /**
@@ -37,11 +39,13 @@ public class GpsDataHandler
             System.out.println("Replaced data in map");
             dataMap.remove(message.getUsername());
             dataMap.put(message.getUsername(), container);
+            this.messagesRecieved++;
         }
         else
         {
             System.out.println("Put data in map");
             dataMap.put(message.getUsername(), container);
+            this.messagesRecieved++;
         }
     }
 
@@ -55,7 +59,7 @@ public class GpsDataHandler
             GpsDataContainer m = (GpsDataContainer) pair.getValue();
             System.out.println(pair.getKey() + ", long: " + m.getMessage().getLongitude() + ", lat: " + m.getMessage().getLatitude());
             System.out.println("Time: " + m.getLastUpdatedHour() + ":" + m.getLastUpdatedMinute());
-
+            System.out.println("Messages total: " + this.messagesRecieved);
         }
     }
 
@@ -107,7 +111,7 @@ public class GpsDataHandler
     public void startCleanupThread(int interval)
     {
         long timeInterval = 1000 * 60 * interval; //minutes -> milliseconds
-
+        System.out.println("Janitor started...");
         Thread cleanUpThread = new Thread(() -> {
             while(this.runCleanup)
             {

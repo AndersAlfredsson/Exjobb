@@ -46,6 +46,7 @@ public class LoginServer implements Runnable
                     System.err.println("Pool did not terminate correctly");
                 }
             }
+            this.runServer = false;
         }
         catch(InterruptedException ie)
         {
