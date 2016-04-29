@@ -18,12 +18,14 @@ public class LoginServer implements Runnable
     private final ExecutorService pool;
     private final ServerSocket socket;
     private final GpsDataHandler handler;
+    private boolean runServer;
 
-    public LoginServer(int poolSize, int port, GpsDataHandler handler) throws IOException
+    LoginServer(int poolSize, int port, GpsDataHandler handler) throws IOException
     {
         this.socket = new ServerSocket(port);
         this.pool = Executors.newFixedThreadPool(poolSize);
         this.handler = handler;
+        this.runServer = true;
     }
 
     /**
@@ -32,7 +34,7 @@ public class LoginServer implements Runnable
      * forcing them to quit.
      * @param pool
      */
-    public void shutdownAndAwaitTermination(ExecutorService pool)
+    private void shutdownAndAwaitTermination(ExecutorService pool)
     {
         try
         {
@@ -61,7 +63,7 @@ public class LoginServer implements Runnable
         try
         {
             System.out.println("ServerListener has started...");
-            while(true)
+            while(this.runServer)
             {
                 try
                 {

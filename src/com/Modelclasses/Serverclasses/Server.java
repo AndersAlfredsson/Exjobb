@@ -9,7 +9,6 @@ import java.io.IOException;
  * The main class for the serverapplication, just a container for all the other server modules
  */
 public class Server {
-    private LoginServer loginServer;
     private GpsDataHandler gpsDataHandler;
     private final int CLEANUP_INTERVAL;
 

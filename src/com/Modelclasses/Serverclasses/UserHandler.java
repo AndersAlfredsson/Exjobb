@@ -15,7 +15,7 @@ import java.net.Socket;
  * Created by Gustav on 2016-04-19.
  * The threaded class that the LoginServer-class uses to set ut communication with the clients
  */
-public class UserHandler implements Runnable, Serializable
+class UserHandler implements Runnable, Serializable
 {
     private final Socket SOCKET;
     private final ObjectInputStream IN;
@@ -27,6 +27,7 @@ public class UserHandler implements Runnable, Serializable
     /**
      * Constructor that sets up the connection and the I/O-ObjectStreams
      * @param socket
+     * @param handler
      * @throws IOException
      */
     public UserHandler(Socket socket, GpsDataHandler handler) throws IOException
@@ -235,7 +236,7 @@ public class UserHandler implements Runnable, Serializable
      * the password is wrong, otherwise it is a successful login and the client can continue
      * @param user
      */
-    public boolean loginAttempt(ApplicationUser user)
+    private boolean loginAttempt(ApplicationUser user)
     {
         ApplicationUser dbUser = DBhandlerSingleton.getInstance().getUser(user.getEmail());
 

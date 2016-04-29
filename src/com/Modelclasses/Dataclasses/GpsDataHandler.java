@@ -13,6 +13,7 @@ import java.util.Iterator;
 public class GpsDataHandler
 {
     private HashMap<String, GpsDataContainer> dataMap;
+    private boolean runCleanup;
 
     /**
      * Default constructor
@@ -20,12 +21,13 @@ public class GpsDataHandler
     public GpsDataHandler()
     {
         this.dataMap = new HashMap<>();
+        this.runCleanup = true;
     }
 
     /**
      * Puts a new object in the map, but checks first if there is already one from the same user,
      * if it is, it removes the object first and then adds the new one.
-     * @param message
+     * @param message Information about gpsCoordinates
      */
     public synchronized void putData(GPSCoordMessage message)
     {
@@ -48,13 +50,11 @@ public class GpsDataHandler
      */
     public void printMap()
     {
-        Iterator it = this.dataMap.entrySet().iterator();
-        while(it.hasNext())
-        {
-            HashMap.Entry pair = (HashMap.Entry) it.next();
+        for (Object o : this.dataMap.entrySet()) {
+            HashMap.Entry pair = (HashMap.Entry) o;
             GpsDataContainer m = (GpsDataContainer) pair.getValue();
             System.out.println(pair.getKey() + ", long: " + m.getMessage().getLongitude() + ", lat: " + m.getMessage().getLatitude());
-            System.out.println("Time: " + m.getLastUpdatedHour()+":"+m.getLastUpdatedMinute());
+            System.out.println("Time: " + m.getLastUpdatedHour() + ":" + m.getLastUpdatedMinute());
 
         }
     }
@@ -64,7 +64,7 @@ public class GpsDataHandler
      * if timedifference >= TIMEDIFFERENCE which is thought to be 5-10 mins
      * but can change, it gets removed
      */
-    public synchronized void cleanup()
+    private synchronized void cleanup()
     {
         System.out.println("Cleanup started...");
         HashMap<String, GpsDataContainer> copy = new HashMap<>(this.dataMap);
@@ -83,7 +83,6 @@ public class GpsDataHandler
                 int i = m.getLastUpdatedMinute() -(60 + minute);
                 if(i <= -TIMEDIFFERENCE)
                 {
-                    //System.out.println("Old Data found with different hours");
                     this.dataMap.remove(m.getMessage().getUsername());
                     amountRemoved++;
                 }
@@ -93,7 +92,6 @@ public class GpsDataHandler
                 int j = m.getLastUpdatedMinute() - minute;
                 if(j < -TIMEDIFFERENCE)
                 {
-                    //System.out.println("Old data found with same hour");
                     this.dataMap.remove(m.getMessage().getUsername());
                     amountRemoved++;
                 }
@@ -104,17 +102,18 @@ public class GpsDataHandler
 
     /**
      * Threaded cleanup-function that calls the cleanup if the hashmap is not empty.
-     * @param interval
+     * @param interval A time in minutes how far between cleanups
      */
     public void startCleanupThread(int interval)
     {
         long timeInterval = 1000 * 60 * interval; //minutes -> milliseconds
 
         Thread cleanUpThread = new Thread(() -> {
-            while(true)
+            while(this.runCleanup)
             {
                 try
                 {
+                    Thread.sleep(timeInterval);
                     if(this.dataMap.size() > 0)
                     {
                         cleanup();
@@ -123,7 +122,6 @@ public class GpsDataHandler
                     {
                         System.out.println("Cleanup Skipped, map is empty");
                     }
-                    Thread.sleep(timeInterval);
                 }
                 catch (InterruptedException e)
                 {
@@ -148,8 +146,8 @@ public class GpsDataHandler
          * Constructor that takes a message that was sent over socket with some
          * longitude and latitude values and a email, also uses the time from the computer
          * to save for later use.
-         * @param message
-         * @param lastUpdated
+         * @param message Information about gpsCoordinates
+         * @param lastUpdated A time when server received message
          */
         public GpsDataContainer(GPSCoordMessage message, ZonedDateTime lastUpdated)
         {

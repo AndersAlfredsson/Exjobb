@@ -19,7 +19,7 @@ public class SocketTest
         Connect();
     }
 
-    public static void Connect()
+    private static void Connect()
     {
         ApplicationUser user = new ApplicationUser("dev@dev.com", "dev");
         boolean keepConnection = true;
@@ -76,16 +76,15 @@ public class SocketTest
             e.printStackTrace();
             try
             {
-                s.close();
+                if (s != null) {
+                    s.close();
+                }
             }
             catch (IOException e1)
             {
                 e1.printStackTrace();
             }
-        } catch (InterruptedException e)
-        {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e)
+        } catch (InterruptedException | ClassNotFoundException e)
         {
             e.printStackTrace();
         }
