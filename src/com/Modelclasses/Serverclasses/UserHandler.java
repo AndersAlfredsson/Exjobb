@@ -10,6 +10,7 @@ import com.Modelclasses.PasswordSecurity;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  * Created by Gustav on 2016-04-19.
@@ -167,7 +168,8 @@ class UserHandler implements Runnable, Serializable
             GPSCoordMessage gpsCoords = ((RequestMessage) message).getGpsCoords();
             handler.putData(gpsCoords);
             handler.printMap();
-            sendMessage(new ServerMessage(ServerMessageType.SensorData, "Hello this is data"));
+            ArrayList<MinGpsData> data = handler.getGpsData(((RequestMessage) message).getGpsCoords().getUsername());
+            sendMessage(new ServerMessage(ServerMessageType.SensorData, data));
         }
     }
 

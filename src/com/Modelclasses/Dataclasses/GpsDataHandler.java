@@ -1,8 +1,9 @@
 package com.Modelclasses.Dataclasses;
 
 import NetworkMessages.GPSCoordMessage;
-
+import NetworkMessages.MinGpsData;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -14,7 +15,7 @@ public class GpsDataHandler
 {
     private HashMap<String, GpsDataContainer> dataMap;
     private boolean runCleanup;
-    private int messagesRecieved;
+    private int messagesReceived;
 
     /**
      * Default constructor
@@ -23,7 +24,7 @@ public class GpsDataHandler
     {
         this.dataMap = new HashMap<>();
         this.runCleanup = true;
-        this.messagesRecieved = 0;
+        this.messagesReceived = 0;
     }
 
     /**
@@ -39,13 +40,13 @@ public class GpsDataHandler
             System.out.println("Replaced data in map");
             dataMap.remove(message.getUsername());
             dataMap.put(message.getUsername(), container);
-            this.messagesRecieved++;
+            this.messagesReceived++;
         }
         else
         {
             System.out.println("Put data in map");
             dataMap.put(message.getUsername(), container);
-            this.messagesRecieved++;
+            this.messagesReceived++;
         }
     }
 
@@ -59,7 +60,7 @@ public class GpsDataHandler
             GpsDataContainer m = (GpsDataContainer) pair.getValue();
             System.out.println(pair.getKey() + ", long: " + m.getMessage().getLongitude() + ", lat: " + m.getMessage().getLatitude());
             System.out.println("Time: " + m.getLastUpdatedHour() + ":" + m.getLastUpdatedMinute());
-            System.out.println("Messages total: " + this.messagesRecieved);
+            System.out.println("Messages total: " + this.messagesReceived);
         }
     }
 
@@ -72,7 +73,7 @@ public class GpsDataHandler
     {
         System.out.println("Cleanup started...");
         HashMap<String, GpsDataContainer> copy = new HashMap<>(this.dataMap);
-        final int TIMEDIFFERENCE = 5; //The max amount of timedifference before it gets removed
+        final int TIMEDIFFERENCE = 5; //The max amount of time difference in minutes before it gets removed
 
         Iterator it = copy.entrySet().iterator();
         int hour = ZonedDateTime.now().getHour();
@@ -82,19 +83,19 @@ public class GpsDataHandler
         {
             HashMap.Entry pair = (HashMap.Entry) it.next();
             GpsDataContainer m = (GpsDataContainer) pair.getValue();
-            if(hour > m.getLastUpdatedHour())
+            if(hour > m.getLastUpdatedHour())//Checks if hour is larger than the saved hour
             {
-                int i = m.getLastUpdatedMinute() -(60 + minute);
-                if(i <= -TIMEDIFFERENCE)
+                int i = m.getLastUpdatedMinute() -(60 + minute);//Gives different algorithms
+                if(i <= -TIMEDIFFERENCE)//Checks if difference is bigger than the set range
                 {
                     this.dataMap.remove(m.getMessage().getUsername());
                     amountRemoved++;
                 }
             }
-            else if(hour == m.getLastUpdatedHour())
+            else if(hour == m.getLastUpdatedHour())//Checks if hour is the same hour as saved
             {
-                int j = m.getLastUpdatedMinute() - minute;
-                if(j < -TIMEDIFFERENCE)
+                int j = m.getLastUpdatedMinute() - minute;//Gives different algorithms
+                if(j < -TIMEDIFFERENCE)//Checks if difference is bigger than the set range
                 {
                     this.dataMap.remove(m.getMessage().getUsername());
                     amountRemoved++;
@@ -136,6 +137,35 @@ public class GpsDataHandler
         cleanUpThread.setDaemon(true);
         cleanUpThread.start();
     }
+
+    //region Setters & Getters
+    /**
+     * Sets the value of runCleanup
+     * @param state
+     */
+    public void setRunCleanup(boolean state)
+    {
+        this.runCleanup = state;
+    }
+
+    public ArrayList<MinGpsData> getGpsData(String email)
+    {
+        ArrayList<MinGpsData> data = new ArrayList<>();
+        Iterator it = dataMap.entrySet().iterator();
+        while(it.hasNext())
+        {
+            HashMap.Entry pair = (HashMap.Entry)it.next();
+            GpsDataContainer container = (GpsDataContainer) pair.getValue();
+            if(container.getMessage().getUsername() != email)
+            {
+                MinGpsData gpsData = new MinGpsData(container.getMessage().getLongitude(), container.getMessage().getLatitude());
+                data.add(gpsData);
+            }
+        }
+        return data;
+    }
+    //endregion
+
 
     /**'
      * Inner class for containing some extra data that is not used anywhere else

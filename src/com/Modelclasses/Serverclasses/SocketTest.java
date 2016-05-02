@@ -56,7 +56,7 @@ public class SocketTest
             while(keepConnection)
             {
                 System.out.println("Still connected");
-                OUT.writeObject(new RequestMessage(user.getEmail(), new GPSCoordMessage(user.getEmail(), 1.0, 1.0)));
+                OUT.writeObject(new RequestMessage(new GPSCoordMessage(user.getEmail(), 1.0, 1.0)));
                 Thread.sleep(10000);
                 System.out.println("Trying to disconnect");
                 OUT.writeObject(new DisconnectMessage(user.getEmail()));
