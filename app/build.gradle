@@ -30,7 +30,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:design:23.3.0'
     compile 'com.android.support:support-v4:23.3.0'
-    //compile files('libs/osmdroid-android-5.2-20160428.203145-4-sources.jar')
     compile 'org.osmdroid:osmdroid-android:5.2@aar'
-    //compile(name:'osmdroid-android-5.2', ext:'aar')
+    compile(name:'osmbonuspack_v5.7', ext:'aar')
 }

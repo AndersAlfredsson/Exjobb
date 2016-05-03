@@ -132,7 +132,7 @@ public class CampusMapActivity extends AppCompatActivity {
                     GPSCoordMessage coordMessage = new GPSCoordMessage("",location.getLongitude(), location.getLatitude());
                     RequestMessage requestMessage = new RequestMessage(coordMessage);
                     final ServerMessage serverMessage = ConnectionHandler.getInstance().sendMessage(requestMessage);
-                    Toast.makeText(mContext,serverMessage.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext,serverMessage.getMessage().toString(), Toast.LENGTH_SHORT).show();
                 }
                 else{
                     Log.d("Fail", "Fail");

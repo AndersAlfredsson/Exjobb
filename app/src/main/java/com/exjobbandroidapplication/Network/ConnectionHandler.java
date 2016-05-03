@@ -32,7 +32,6 @@ public class ConnectionHandler {
         if (ourInstance == null){
             ourInstance = new ConnectionHandler();
         }
-
         return ourInstance;
     }
 
@@ -83,6 +82,10 @@ public class ConnectionHandler {
 
     public void seteMail(String eMail) {
         this.eMail = eMail;
+    }
+
+    public String geteMail() {
+        return eMail;
     }
 
     /**

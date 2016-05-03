@@ -37,6 +37,7 @@ import com.exjobbandroidapplication.Network.ConnectionHandler;
 import com.exjobbandroidapplication.R;
 import com.exjobbandroidapplication.Resources.inputCheck;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +80,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
-        //populateAutoComplete();
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -291,10 +291,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         @Override
         protected Boolean doInBackground(Void... params) {
             ConnectionHandler.getInstance().connectToServer();
+            ConnectionHandler.getInstance().seteMail(mEmail);
 
             if (registrationMode){
                 ConnectionHandler.getInstance().seteMail(mEmail);
                 final ServerMessage serverMessage = ConnectionHandler.getInstance().sendMessage(new RegisterMessage(mEmail, mPassword));
+
                 if (serverMessage.getMessageType() == ServerMessageType.Authenticated){
                     registrationMode = false;
                     return true;
@@ -303,7 +305,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     loginActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            final String message = serverMessage.getMessage();
+                            final String message = serverMessage.getMessage().toString();
                             mEmailView.setError(message);
                         }
                     });
@@ -319,7 +321,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     loginActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            final String message = serverMessage.getMessage();
+                            final String message = serverMessage.getMessage().toString();
                             mEmailView.setError(message);
                         }
                     });
