@@ -168,7 +168,7 @@ class UserHandler implements Runnable, Serializable
             GPSCoordMessage gpsCoords = ((RequestMessage) message).getGpsCoords();
             handler.putData(gpsCoords);
             handler.printMap();
-            ArrayList<MinGpsData> data = handler.getGpsData(((RequestMessage) message).getGpsCoords().getUsername());
+            ArrayList<GpsCoordinates> data = handler.getGpsData(((RequestMessage) message).getGpsCoords().getUsername());
             sendMessage(new ServerMessage(ServerMessageType.SensorData, data));
         }
     }

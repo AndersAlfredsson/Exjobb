@@ -3,6 +3,8 @@ package com.Modelclasses.Serverclasses;
 import Enums.ServerMessageType;
 import NetworkMessages.*;
 import com.Modelclasses.ApplicationUser;
+import com.Modelclasses.Dataclasses.BoundingBox;
+import com.Modelclasses.Dataclasses.SensorDataHandler;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -16,7 +18,31 @@ public class SocketTest
 {
     public static void main(String[] args)
     {
-        Connect();
+        TestBoundingBox();
+    }
+
+    public static void TestBoundingBox()
+    {
+        //Latitude: 59.255664 | Longitude: 15.242559
+
+        GpsCoordinates g = new GpsCoordinates(59.255664, 15.242559);
+        BoundingBox inner = new BoundingBox(59.25545, 15.243498, 59.253333, 15.252124);
+        BoundingBox outer = new BoundingBox(59.256789, 15.240086, 59.251622, 15.256308);
+        System.out.println("inner: " + inner.isInsideBox(g));
+        System.out.println("outer: " + outer.isInsideBox(g));
+    }
+
+
+    public static void TestSensorDataHandler()
+    {
+        SensorDataHandler data = new SensorDataHandler();
+        data.addSection(1,2,3,4);
+        data.addPersonToSection(1);
+        data.addPersonToSection(2);
+        data.addPersonToSection(3);
+        data.addPersonToSection(4);
+        data.printSections();
+
     }
 
     private static void Connect()

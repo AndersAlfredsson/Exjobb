@@ -1,7 +1,7 @@
 package com.Modelclasses.Dataclasses;
 
 import NetworkMessages.GPSCoordMessage;
-import NetworkMessages.MinGpsData;
+import NetworkMessages.GpsCoordinates;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +14,6 @@ import java.util.Iterator;
 public class GpsDataHandler
 {
     private HashMap<String, GpsDataContainer> dataMap;
-    private boolean runCleanup;
     private int messagesReceived;
 
     /**
@@ -23,7 +22,6 @@ public class GpsDataHandler
     public GpsDataHandler()
     {
         this.dataMap = new HashMap<>();
-        this.runCleanup = true;
         this.messagesReceived = 0;
     }
 
@@ -58,8 +56,7 @@ public class GpsDataHandler
         for (Object o : this.dataMap.entrySet()) {
             HashMap.Entry pair = (HashMap.Entry) o;
             GpsDataContainer m = (GpsDataContainer) pair.getValue();
-            System.out.println(pair.getKey() + ", long: " + m.getMessage().getLongitude() + ", lat: " + m.getMessage().getLatitude());
-            System.out.println("Time: " + m.getLastUpdatedHour() + ":" + m.getLastUpdatedMinute());
+            System.out.println(pair.getKey()  + ", lat: " + m.getMessage().getLatitude() + ", long: " + m.getMessage().getLongitude());
             System.out.println("Messages total: " + this.messagesReceived);
         }
     }
@@ -69,7 +66,7 @@ public class GpsDataHandler
      * if timedifference >= TIMEDIFFERENCE which is thought to be 5-10 mins
      * but can change, it gets removed
      */
-    private synchronized void cleanup()
+    public synchronized void cleanup()
     {
         System.out.println("Cleanup started...");
         HashMap<String, GpsDataContainer> copy = new HashMap<>(this.dataMap);
@@ -105,52 +102,19 @@ public class GpsDataHandler
         System.out.println("Cleanup done with " + amountRemoved + " removed");
     }
 
-    /**
-     * Threaded cleanup-function that calls the cleanup if the hashmap is not empty.
-     * @param interval A time in minutes how far between cleanups
-     */
-    public void startCleanupThread(int interval)
+    public int getMapSize()
     {
-        long timeInterval = 1000 * 60 * interval; //minutes -> milliseconds
-        System.out.println("Janitor started...");
-        Thread cleanUpThread = new Thread(() -> {
-            while(this.runCleanup)
-            {
-                try
-                {
-                    Thread.sleep(timeInterval);
-                    if(this.dataMap.size() > 0)
-                    {
-                        cleanup();
-                    }
-                    else
-                    {
-                        System.out.println("Cleanup Skipped, map is empty");
-                    }
-                }
-                catch (InterruptedException e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        });
-        cleanUpThread.setDaemon(true);
-        cleanUpThread.start();
+        return this.dataMap.size();
     }
 
-    //region Setters & Getters
     /**
-     * Sets the value of runCleanup
-     * @param state
+     * Gets a list of MinGpsData that is just a long and lat value stored in a oontainer
+     * @param email
+     * @return
      */
-    public void setRunCleanup(boolean state)
+    public ArrayList<GpsCoordinates> getGpsData(String email)
     {
-        this.runCleanup = state;
-    }
-
-    public ArrayList<MinGpsData> getGpsData(String email)
-    {
-        ArrayList<MinGpsData> data = new ArrayList<>();
+        ArrayList<GpsCoordinates> data = new ArrayList<>();
         Iterator it = dataMap.entrySet().iterator();
         while(it.hasNext())
         {
@@ -158,7 +122,7 @@ public class GpsDataHandler
             GpsDataContainer container = (GpsDataContainer) pair.getValue();
             if(container.getMessage().getUsername() != email)
             {
-                MinGpsData gpsData = new MinGpsData(container.getMessage().getLongitude(), container.getMessage().getLatitude());
+                GpsCoordinates gpsData = new GpsCoordinates(container.getMessage().getLatitude(), container.getMessage().getLongitude());
                 data.add(gpsData);
             }
         }
@@ -166,6 +130,7 @@ public class GpsDataHandler
     }
     //endregion
 
+    //TODO Ändra ordning på longitude och latitude så lat= 59 och long = 15
 
     /**'
      * Inner class for containing some extra data that is not used anywhere else
@@ -188,6 +153,7 @@ public class GpsDataHandler
             this.message = message;
             this.lastUpdatedHour = lastUpdated.getHour();
             this.lastUpdatedMinute = lastUpdated.getMinute();
+            System.out.println("time: " + lastUpdatedHour + ":" + lastUpdatedMinute + ":"+lastUpdated.getSecond());
         }
 
         //region Getters and Setters

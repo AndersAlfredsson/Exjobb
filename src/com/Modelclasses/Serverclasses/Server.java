@@ -1,6 +1,8 @@
 package com.Modelclasses.Serverclasses;
 
 import com.Modelclasses.Dataclasses.GpsDataHandler;
+import com.Modelclasses.Dataclasses.SensorDataHandler;
+import com.Modelclasses.Janitor.Janitor;
 
 import java.io.IOException;
 
@@ -10,12 +12,16 @@ import java.io.IOException;
  */
 public class Server {
     private GpsDataHandler gpsDataHandler;
+    private SensorDataHandler sensorDataHandler;
+    private final Janitor janitor;
     private final int CLEANUP_INTERVAL;
 
     public Server()
     {
         this.gpsDataHandler = new GpsDataHandler();
-        this.CLEANUP_INTERVAL = 2;
+        this.sensorDataHandler = new SensorDataHandler();
+        this.janitor = new Janitor(gpsDataHandler, sensorDataHandler, 2);
+        this.CLEANUP_INTERVAL = 5;
     }
 
     public void startServer()
@@ -23,7 +29,7 @@ public class Server {
         try
         {
             (new Thread(new LoginServer(5, 9058, gpsDataHandler))).start();
-            gpsDataHandler.startCleanupThread(CLEANUP_INTERVAL);
+            janitor.startCleanupThread();
         }
         catch (IOException e) {
             e.printStackTrace();
