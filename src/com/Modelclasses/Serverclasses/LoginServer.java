@@ -1,6 +1,7 @@
 package com.Modelclasses.Serverclasses;
 
 import com.Modelclasses.Dataclasses.GpsDataHandler;
+import com.Modelclasses.Serverclasses.UserHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;

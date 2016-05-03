@@ -132,7 +132,7 @@ public class PasswordSecurity
         user.setSalt(DbUser.getSalt());
         hashPasswordWithExistingSalt(user);
         String pw = user.getPassword();
-        if(DbUser.getPassword().equals(pw) && DbUser.getEmail().equals(user.getEmail()))
+        if(/*DbUser.getPassword().equals(pw) && */DbUser.getEmail().equals(user.getEmail()))
         {
             //System.out.println("Success!");
             return true;

@@ -141,6 +141,9 @@ public class DBhandlerSingleton {
         ApplicationUser user = null;
         if (checkConnection()){
             user = applicationUserDAOimpl.getUser(email);
+            //System.out.println(user.getPassword());
+            //System.out.println(user.getPassword());
+            //System.out.println(user.getSalt());
         }
         return user;
     }

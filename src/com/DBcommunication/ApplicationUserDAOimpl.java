@@ -147,7 +147,6 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
      */
     @Override
     public void insertUser(ApplicationUser user) {
-        PasswordSecurity.hashPassword(user);
         try {
             PreparedStatement preparedStatement =  DBhandlerSingleton.getInstance().getConnection().prepareStatement("INSERT INTO Users(Email, Password, Salt) VALUES (?, ?, ?);");
             preparedStatement.setString(1, user.getEmail());

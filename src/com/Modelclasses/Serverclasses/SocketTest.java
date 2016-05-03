@@ -5,6 +5,7 @@ import NetworkMessages.*;
 import com.Modelclasses.ApplicationUser;
 import com.Modelclasses.Dataclasses.BoundingBox;
 import com.Modelclasses.Dataclasses.SensorDataHandler;
+import com.Modelclasses.PasswordSecurity;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -18,7 +19,24 @@ public class SocketTest
 {
     public static void main(String[] args)
     {
-        TestBoundingBox();
+        test();
+    }
+
+    public static void test()
+    {
+        ApplicationUser u = new ApplicationUser("hej", "hej");
+        PasswordSecurity.hashPassword(u);
+        ApplicationUser dbUser = new ApplicationUser(0, "hej", u.getPassword(), u.getSalt());
+        u.setPassword("hej");
+        if(PasswordSecurity.authenticate(u, dbUser))
+        {
+            System.out.println("what");
+        }
+        else
+        {
+            System.out.println("vafan händer?!");
+        }
+
     }
 
     public static void TestBoundingBox()
@@ -26,10 +44,10 @@ public class SocketTest
         //Latitude: 59.255664 | Longitude: 15.242559
 
         GpsCoordinates g = new GpsCoordinates(59.255664, 15.242559);
-        BoundingBox inner = new BoundingBox(59.25545, 15.243498, 59.253333, 15.252124);
-        BoundingBox outer = new BoundingBox(59.256789, 15.240086, 59.251622, 15.256308);
-        System.out.println("inner: " + inner.isInsideBox(g));
-        System.out.println("outer: " + outer.isInsideBox(g));
+        BoundingBox innerBox = new BoundingBox(59.25545, 15.243498, 59.253333, 15.252124);
+        BoundingBox outerBox = new BoundingBox(59.256789, 15.240086, 59.251622, 15.256308);
+        //System.out.println("inner: " + inner.isInsideBox(g));
+        //System.out.println("outer: " + outer.isInsideBox(g));
     }
 
 

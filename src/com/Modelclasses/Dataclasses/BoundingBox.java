@@ -11,12 +11,24 @@ public class BoundingBox
     private GpsCoordinates northWest;
     private GpsCoordinates southEast;
 
+    /**
+     * Constructor defining the box
+     * @param nwLat latitude of the northwest point
+     * @param nwLong longitude of the northwest point
+     * @param seLat latitude of the southeast point
+     * @param seLong longitude of the southeast point
+     */
     public BoundingBox(double nwLat, double nwLong, double seLat, double seLong)
     {
         northWest = new GpsCoordinates(nwLat, nwLong);
         southEast = new GpsCoordinates(seLat, seLong);
     }
 
+    /**
+     * Checks if some gps coordinates is inside the boundingBox
+     * @param coords
+     * @return
+     */
     public boolean isInsideBox(GpsCoordinates coords)
     {
         if(coords.getLongitude() > northWest.getLongitude() &&

@@ -15,6 +15,8 @@ public class GpsDataHandler
 {
     private HashMap<String, GpsDataContainer> dataMap;
     private int messagesReceived;
+    private final BoundingBox INNER_BOX = new BoundingBox(59.25545, 15.243498, 59.253333, 15.252124);
+    private final BoundingBox OUTER_BOX = new BoundingBox(59.256789, 15.240086, 59.251622, 15.256308);
 
     /**
      * Default constructor
@@ -33,19 +35,27 @@ public class GpsDataHandler
     public synchronized void putData(GPSCoordMessage message)
     {
         GpsDataContainer container = new GpsDataContainer(message, ZonedDateTime.now());
-        if(dataMap.containsKey(message.getUsername()))
+        if(this.INNER_BOX.isInsideBox(new GpsCoordinates(message.getLatitude(), message.getLongitude())))
         {
-            System.out.println("Replaced data in map");
-            dataMap.remove(message.getUsername());
-            dataMap.put(message.getUsername(), container);
-            this.messagesReceived++;
+            if(dataMap.containsKey(message.getUsername()))
+            {
+                System.out.println("Replaced data in map");
+                dataMap.remove(message.getUsername());
+                dataMap.put(message.getUsername(), container);
+                this.messagesReceived++;
+            }
+            else
+            {
+                System.out.println("Put data in map");
+                dataMap.put(message.getUsername(), container);
+                this.messagesReceived++;
+            }
         }
         else
         {
-            System.out.println("Put data in map");
-            dataMap.put(message.getUsername(), container);
-            this.messagesReceived++;
+            System.out.println("Coordinate outside bounding box, save skipped");
         }
+
     }
 
     /**
@@ -57,8 +67,8 @@ public class GpsDataHandler
             HashMap.Entry pair = (HashMap.Entry) o;
             GpsDataContainer m = (GpsDataContainer) pair.getValue();
             System.out.println(pair.getKey()  + ", lat: " + m.getMessage().getLatitude() + ", long: " + m.getMessage().getLongitude());
-            System.out.println("Messages total: " + this.messagesReceived);
         }
+        System.out.println("Messages total: " + this.messagesReceived);
     }
 
     /**
@@ -70,7 +80,7 @@ public class GpsDataHandler
     {
         System.out.println("Cleanup started...");
         HashMap<String, GpsDataContainer> copy = new HashMap<>(this.dataMap);
-        final int TIMEDIFFERENCE = 5; //The max amount of time difference in minutes before it gets removed
+        final int TIMEDIFFERENCE = 2; //The max amount of time difference in minutes before it gets removed
 
         Iterator it = copy.entrySet().iterator();
         int hour = ZonedDateTime.now().getHour();
@@ -102,6 +112,11 @@ public class GpsDataHandler
         System.out.println("Cleanup done with " + amountRemoved + " removed");
     }
 
+    //region Getters & Setters
+    /**
+     * Gets the size of the datamap
+     * @return
+     */
     public int getMapSize()
     {
         return this.dataMap.size();
@@ -128,9 +143,16 @@ public class GpsDataHandler
         }
         return data;
     }
-    //endregion
 
-    //TODO Ändra ordning på longitude och latitude så lat= 59 och long = 15
+    public BoundingBox getINNER_BOX() {
+        return INNER_BOX;
+    }
+
+    public BoundingBox getOUTER_BOX() {
+        return OUTER_BOX;
+    }
+
+    //endregion
 
     /**'
      * Inner class for containing some extra data that is not used anywhere else

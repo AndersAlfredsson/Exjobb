@@ -16,7 +16,7 @@ import java.util.ArrayList;
  * Created by Gustav on 2016-04-19.
  * The threaded class that the LoginServer-class uses to set ut communication with the clients
  */
-class UserHandler implements Runnable, Serializable
+public class UserHandler implements Runnable, Serializable
 {
     private final Socket SOCKET;
     private final ObjectInputStream IN;
@@ -168,8 +168,16 @@ class UserHandler implements Runnable, Serializable
             GPSCoordMessage gpsCoords = ((RequestMessage) message).getGpsCoords();
             handler.putData(gpsCoords);
             handler.printMap();
-            ArrayList<GpsCoordinates> data = handler.getGpsData(((RequestMessage) message).getGpsCoords().getUsername());
-            sendMessage(new ServerMessage(ServerMessageType.SensorData, data));
+
+            if(handler.getOUTER_BOX().isInsideBox(new GpsCoordinates(gpsCoords.getLatitude(), gpsCoords.getLongitude())))
+            {
+                ArrayList<GpsCoordinates> data = handler.getGpsData(((RequestMessage) message).getGpsCoords().getUsername());
+                sendMessage(new ServerMessage(ServerMessageType.SensorData, data));
+            }
+            else
+            {
+                sendMessage(new ServerMessage(ServerMessageType.SensorData, null));
+            }
         }
     }
 
@@ -230,7 +238,6 @@ class UserHandler implements Runnable, Serializable
         System.out.println("Register not possible");
         return false;
     }
-
 
     /**
      * Does a loginattempt by first checking if the user exists, if id does not, username is wrong
