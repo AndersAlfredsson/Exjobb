@@ -1,5 +1,6 @@
 package com.Modelclasses.Dataclasses;
 
+import NetworkMessages.GPSCoordMessage;
 import NetworkMessages.GpsCoordinates;
 
 /**
@@ -29,11 +30,11 @@ public class BoundingBox
      * @param coords
      * @return
      */
-    public boolean isInsideBox(GpsCoordinates coords)
+    public boolean isInsideBox(GPSCoordMessage coords)
     {
         if(coords.getLongitude() > northWest.getLongitude() &&
                 coords.getLatitude() < northWest.getLatitude() &&
-                coords.getLongitude() < southEast.getLongitude()&&
+                coords.getLongitude() < southEast.getLongitude() &&
                 coords.getLatitude() > southEast.getLatitude())
         {
             return true;

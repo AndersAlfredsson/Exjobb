@@ -38,10 +38,10 @@ public class LoginServer implements Runnable
     {
         try
         {
-            if(!pool.awaitTermination(20, TimeUnit.SECONDS))
+            if(!pool.awaitTermination(60, TimeUnit.SECONDS))
             {
                 pool.shutdownNow();
-                if(!pool.awaitTermination(20, TimeUnit.SECONDS))
+                if(!pool.awaitTermination(60, TimeUnit.SECONDS))
                 {
                     System.err.println("Pool did not terminate correctly");
                 }
@@ -56,31 +56,30 @@ public class LoginServer implements Runnable
         }
     }
 
+    public ServerSocket getServerSocket()
+    {
+        return this.socket;
+    }
+
     /**
      * The threaded ServerListener, it accepts connections and starts a thread for the communication
      */
     @Override
     public void run()
     {
-        try
+        System.out.println("ServerListener has started...");
+        while(this.runServer)
         {
-            System.out.println("ServerListener has started...");
-            while(this.runServer)
+            try
             {
-                try
-                {
-                    pool.execute(new UserHandler(this.socket.accept(), this.handler));
-                }
-                catch (IOException e)
-                {
-                    pool.shutdown();
-                }
+                pool.execute(new UserHandler(this.socket.accept(), this.handler));
+            }
+            catch (IOException e)
+            {
+                pool.shutdown();
             }
         }
-        catch(Exception e)
-        {
-            shutdownAndAwaitTermination(pool);
-        }
+        System.out.println("Server Listener shutdown...");
     }
 
     public void shutdown()

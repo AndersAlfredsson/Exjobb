@@ -8,9 +8,13 @@ import com.Modelclasses.ApplicationUser;
 import com.Modelclasses.Dataclasses.GpsDataHandler;
 import com.Modelclasses.PasswordSecurity;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by Gustav on 2016-04-19.
@@ -109,7 +113,7 @@ public class UserHandler implements Runnable, Serializable
                 this.connected = false;
                 try
                 {
-                    System.out.println("Client closed connection without disconnect...");
+                    System.err.println("Client closed connection without disconnect...");
                     this.SOCKET.close();
                 }
                 catch (IOException e1)
@@ -176,10 +180,13 @@ public class UserHandler implements Runnable, Serializable
             handler.putData(gpsCoords);
             //handler.printMap();
 
-            if(handler.getOUTER_BOX().isInsideBox(new GpsCoordinates(gpsCoords.getLatitude(), gpsCoords.getLongitude())))
+            if(handler.getOUTER_BOX().isInsideBox(gpsCoords))
             {
+                Random rng = new Random();
+                int i = rng.nextInt((10 - 1) + 1 ) + 1;
+                System.out.println("int: " + i);
                 ArrayList<GpsCoordinates> data = handler.getGpsData(((RequestMessage) message).getGpsCoords().getUsername());
-                sendMessage(new ServerMessage(ServerMessageType.SensorData, data));
+                sendMessage(new ServerMessage(ServerMessageType.SensorData, data, i));
             }
             else
             {
@@ -215,15 +222,18 @@ public class UserHandler implements Runnable, Serializable
     {
         try
         {
+            System.out.println("Disconnect sent");
             sendMessage(new ServerMessage(ServerMessageType.Disconnect, reason));
             this.OUT.flush();
             this.SOCKET.close();
             this.connected = false;
             this.authenticated = false;
+            System.out.println("Disconnect successful");
             return true;
         }
         catch (IOException e)
         {
+            System.err.println("Disconnect unsuccessful");
             e.printStackTrace();
             return false;
         }

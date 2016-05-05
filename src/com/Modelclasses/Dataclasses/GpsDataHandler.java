@@ -35,7 +35,7 @@ public class GpsDataHandler
     public synchronized void putData(GPSCoordMessage message)
     {
         GpsDataContainer container = new GpsDataContainer(message, ZonedDateTime.now());
-        if(this.INNER_BOX.isInsideBox(new GpsCoordinates(message.getLatitude(), message.getLongitude())))
+        if(this.INNER_BOX.isInsideBox(message))
         {
             if(dataMap.containsKey(message.getUsername()))
             {
@@ -123,9 +123,9 @@ public class GpsDataHandler
     }
 
     /**
-     * Gets a list of MinGpsData that is just a long and lat value stored in a oontainer
+     * Gets a list of GpsCoordinates that is just a long and lat value stored in a oontainer
      * @param email
-     * @return
+     * @return Returns a list of all coordinates
      */
     public ArrayList<GpsCoordinates> getGpsData(String email)
     {
@@ -144,10 +144,18 @@ public class GpsDataHandler
         return data;
     }
 
+    /**
+     * Gets the inner bounding box
+     * @return
+     */
     public BoundingBox getINNER_BOX() {
         return INNER_BOX;
     }
 
+    /**
+     * Gets the outer bounding boc
+     * @return
+     */
     public BoundingBox getOUTER_BOX() {
         return OUTER_BOX;
     }
@@ -175,7 +183,7 @@ public class GpsDataHandler
             this.message = message;
             this.lastUpdatedHour = lastUpdated.getHour();
             this.lastUpdatedMinute = lastUpdated.getMinute();
-            //System.out.println("time: " + lastUpdatedHour + ":" + lastUpdatedMinute + ":"+lastUpdated.getSecond());
+            System.out.println("time: " + lastUpdatedHour + ":" + lastUpdatedMinute + ":"+lastUpdated.getSecond());
         }
 
         //region Getters and Setters

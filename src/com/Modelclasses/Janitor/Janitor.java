@@ -65,7 +65,7 @@ public class Janitor
                     e.printStackTrace();
                 }
             }
-            System.out.println("GpsJanitor exited...");
+            System.out.println("GpsJanitor shutdown...");
         });
 
         Thread sensorCleanUpThread = new Thread(() ->
@@ -85,7 +85,7 @@ public class Janitor
                     e.printStackTrace();
                 }
             }
-            System.out.println("ServerJanitor exited...");
+            System.out.println("SensorJanitor shutdown...");
         });
 
         gpsCleanUpThread.setDaemon(true);
