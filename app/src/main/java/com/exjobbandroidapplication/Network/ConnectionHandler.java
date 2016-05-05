@@ -22,7 +22,7 @@ public class ConnectionHandler {
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
     private boolean connected = false;
-    private final String IPADRESS = "10.178.2.148";
+    private final String IPADRESS = "78.68.96.226";
     private final int PORTNR = 9058;
     private String eMail;
     private ServerMessage receivedMessage = null;
@@ -98,7 +98,9 @@ public class ConnectionHandler {
             out.writeObject(message);
             try {
                 ServerMessage serverMessage = (ServerMessage) in.readObject();
-                return serverMessage;
+                if (serverMessage != null) {
+                    return serverMessage;
+                }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }

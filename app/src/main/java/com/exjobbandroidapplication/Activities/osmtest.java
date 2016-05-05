@@ -1,20 +1,24 @@
 package com.exjobbandroidapplication.Activities;
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DialogTitle;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -61,6 +65,8 @@ public class osmtest extends AppCompatActivity {
         }
 
 
+
+
         setContentView(R.layout.activity_osmtest);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setupMapView();
@@ -77,6 +83,13 @@ public class osmtest extends AppCompatActivity {
 
         iconOverlayIndex = map.getOverlays().size();
 
+        TextView linkText = (TextView) findViewById(R.id.CopyrightLink);
+        linkText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                linkClicked();
+            }
+        });
 
         IMyLocationConsumer iMyLocationConsumer = new IMyLocationConsumer() {
             @Override
@@ -106,9 +119,13 @@ public class osmtest extends AppCompatActivity {
         map.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                return true;
+                return false;
             }
         });
+    }
+
+    private void linkClicked() {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.openstreetmap.org/copyright")));
     }
 
     private void setupMapView() {
@@ -164,6 +181,9 @@ public class osmtest extends AppCompatActivity {
      */
     private void displayGPSCoordinates(ArrayList<GpsCoordinates> list){
         ArrayList<OverlayItem> markerList = new ArrayList<>();
+        if (list == null  ||list.size() < 1) {
+            return;
+        }
         for (GpsCoordinates gpsCoordinates : list) {
             Log.d("GPS", "New object" + gpsCoordinates.toString());
             OverlayItem currentLocMarker = new OverlayItem(Double.toString(gpsCoordinates.getLatitude()) , Double.toString(gpsCoordinates.getLongitude()), new GeoPoint(gpsCoordinates.getLatitude(), gpsCoordinates.getLongitude()));
@@ -214,6 +234,10 @@ public class osmtest extends AppCompatActivity {
             GPSCoordMessage message = new GPSCoordMessage(ConnectionHandler.getInstance().geteMail(), location.getLatitude(),location.getLongitude());
             ServerMessage serverMessage = ConnectionHandler.getInstance().sendMessage(new RequestMessage(message));
 
+            if (serverMessage == null) {
+                return false;
+            }
+
             if (serverMessage != null && serverMessage.getMessageType() == ServerMessageType.SensorData) {
                 final ArrayList<GpsCoordinates> list = (ArrayList) serverMessage.getMessage();
                 final ArrayList<GpsCoordinates> fakelist = new ArrayList<>();
@@ -236,6 +260,13 @@ public class osmtest extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
+
+            if (aBoolean) {
+                Log.d("Receiving GPS", "Successfully received GPS coordinates from server");
+            }
+            else {
+                Log.d("Receiving GPS", "Failed receiving GPS coordinates from server");
+            }
         }
     }
 }
