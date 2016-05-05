@@ -69,6 +69,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private boolean registrationMode = false;
     private Button mEmailSignInButton;
+    private Button backButton;
     private LoginActivity loginActivity = this;
 
 
@@ -113,6 +114,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
     });
 
+        backButton = (Button) findViewById(R.id.back_button);
+        backButton.setVisibility(View.GONE);
+        backButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                backPressed();
+            }
+        });
+
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
     }
@@ -125,6 +135,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                            @NonNull int[] grantResults) {
     }
 
+    private void backPressed() {
+        backButton.setVisibility(View.GONE);
+        registrationMode = false;
+        mPasswordrepeatView.setVisibility(View.GONE);
+        mEmailSignInButton.setVisibility(View.VISIBLE);
+        mPasswordrepeatView.setText("");
+    }
+
     private void registrationPressed() {
         if (registrationMode) {
             attemptLogin();
@@ -133,6 +151,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             registrationMode = true;
             mEmailSignInButton.setVisibility(View.GONE);
             mPasswordrepeatView.setVisibility(View.VISIBLE);
+            backButton.setVisibility(View.VISIBLE);
         }
     }
 

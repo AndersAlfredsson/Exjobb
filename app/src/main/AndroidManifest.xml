@@ -39,7 +39,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_osmdroidtestactivity"
             android:theme="@style/FullscreenTheme" />
-        <activity android:name=".Activities.osmtest"></activity>
+        <activity android:name=".Activities.osmtest">
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
+        </activity>
     </application>
 
 </manifest>

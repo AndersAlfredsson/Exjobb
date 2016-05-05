@@ -22,7 +22,7 @@ public class ConnectionHandler {
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
     private boolean connected = false;
-    private final String IPADRESS = "10.22.6.79";
+    private final String IPADRESS = "10.178.2.148";
     private final int PORTNR = 9058;
     private String eMail;
     private ServerMessage receivedMessage = null;

@@ -1,16 +1,20 @@
 package com.exjobbandroidapplication.Activities;
 import android.Manifest;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DialogTitle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -49,14 +53,22 @@ public class osmtest extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Hides the titlebar.
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+
+
         setContentView(R.layout.activity_osmtest);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setupMapView();
         myLocationNewOverlay = new MyLocationNewOverlay(map);
         gpsMyLocationProvider = new GpsMyLocationProvider(this);
 
         askForStoragePermission();
         askForGPSPermission();
-
         setupCampusSections();
 
         myLocationNewOverlay.enableMyLocation();
@@ -64,6 +76,7 @@ public class osmtest extends AppCompatActivity {
         map.getOverlays().addAll(campusSections);
 
         iconOverlayIndex = map.getOverlays().size();
+
 
         IMyLocationConsumer iMyLocationConsumer = new IMyLocationConsumer() {
             @Override
