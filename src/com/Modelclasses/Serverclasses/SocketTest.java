@@ -50,7 +50,6 @@ public class SocketTest
         //System.out.println("outer: " + outer.isInsideBox(g));
     }
 
-
     public static void TestSensorDataHandler()
     {
         SensorDataHandler data = new SensorDataHandler();

@@ -1,7 +1,6 @@
 package com.Modelclasses.Serverclasses;
 
 import com.Modelclasses.Dataclasses.GpsDataHandler;
-import com.Modelclasses.Serverclasses.UserHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -47,6 +46,7 @@ public class LoginServer implements Runnable
                     System.err.println("Pool did not terminate correctly");
                 }
             }
+            System.out.println("Pool exited...");
             this.runServer = false;
         }
         catch(InterruptedException ie)
@@ -81,5 +81,10 @@ public class LoginServer implements Runnable
         {
             shutdownAndAwaitTermination(pool);
         }
+    }
+
+    public void shutdown()
+    {
+        shutdownAndAwaitTermination(this.pool);
     }
 }

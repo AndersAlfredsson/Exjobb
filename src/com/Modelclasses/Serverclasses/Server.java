@@ -4,35 +4,70 @@ import com.Modelclasses.Dataclasses.GpsDataHandler;
 import com.Modelclasses.Dataclasses.SensorDataHandler;
 import com.Modelclasses.Janitor.Janitor;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * Created by Gustav on 2016-04-29.
  * The main class for the serverapplication, just a container for all the other server modules
  */
-public class Server {
+public class Server
+{
+    private static boolean isServerShutdown = false;
     private GpsDataHandler gpsDataHandler;
+    private LoginServer loginServer;
     private SensorDataHandler sensorDataHandler;
     private final Janitor janitor;
-    private final int CLEANUP_INTERVAL;
 
     public Server()
     {
         this.gpsDataHandler = new GpsDataHandler();
         this.sensorDataHandler = new SensorDataHandler();
-        this.janitor = new Janitor(gpsDataHandler, sensorDataHandler, 2);
-        this.CLEANUP_INTERVAL = 5;
+        this.janitor = new Janitor(gpsDataHandler, sensorDataHandler, 3, 1);
     }
 
+    /**
+     * Starts a new server and all the components
+     */
     public void startServer()
     {
         try
         {
-            (new Thread(new LoginServer(5, 9058, gpsDataHandler))).start();
+            (new Thread(this.loginServer = new LoginServer(5, 9058, gpsDataHandler))).start();
             janitor.startCleanupThread();
+            System.out.println("Type 'quit' to initiate shutdown");
+            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+
+
+            String line = "";
+            while(line.equalsIgnoreCase("quit") == false){
+                line = in.readLine();
+            }
+            shutdown();
+
         }
-        catch (IOException e) {
+        catch (IOException e)
+        {
             e.printStackTrace();
+            shutdown();
         }
+    }
+
+    /**
+     * Starts the shutdown process, takes several minutes to wait for everything to finish
+     */
+    public void shutdown()
+    {
+        isServerShutdown = true;
+        System.out.println("Shutdown initiated");
+        System.out.println("Please wait, this will take several minutes");
+        janitor.setRunCleanup(false);
+        this.loginServer.shutdown();
+    }
+
+    public static boolean isIsServerShutdownInitiated()
+    {
+        return isServerShutdown;
     }
 }

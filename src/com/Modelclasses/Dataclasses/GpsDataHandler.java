@@ -39,22 +39,22 @@ public class GpsDataHandler
         {
             if(dataMap.containsKey(message.getUsername()))
             {
-                System.out.println("Replaced data in map");
+                //System.out.println("Replaced data in map");
                 dataMap.remove(message.getUsername());
                 dataMap.put(message.getUsername(), container);
                 this.messagesReceived++;
             }
             else
             {
-                System.out.println("Put data in map");
+                //System.out.println("Put data in map");
                 dataMap.put(message.getUsername(), container);
                 this.messagesReceived++;
             }
         }
-        else
-        {
-            System.out.println("Coordinate outside bounding box, save skipped");
-        }
+//        else
+//        {
+//            System.out.println("Coordinate outside bounding box, save skipped");
+//        }
 
     }
 
@@ -78,7 +78,7 @@ public class GpsDataHandler
      */
     public synchronized void cleanup()
     {
-        System.out.println("Cleanup started...");
+        System.out.println("GpsData Cleanup started...");
         HashMap<String, GpsDataContainer> copy = new HashMap<>(this.dataMap);
         final int TIMEDIFFERENCE = 2; //The max amount of time difference in minutes before it gets removed
 
@@ -109,7 +109,7 @@ public class GpsDataHandler
                 }
             }
         }
-        System.out.println("Cleanup done with " + amountRemoved + " removed");
+        System.out.println("GpsData Cleanup done with " + amountRemoved + " removed");
     }
 
     //region Getters & Setters
@@ -175,7 +175,7 @@ public class GpsDataHandler
             this.message = message;
             this.lastUpdatedHour = lastUpdated.getHour();
             this.lastUpdatedMinute = lastUpdated.getMinute();
-            System.out.println("time: " + lastUpdatedHour + ":" + lastUpdatedMinute + ":"+lastUpdated.getSecond());
+            //System.out.println("time: " + lastUpdatedHour + ":" + lastUpdatedMinute + ":"+lastUpdated.getSecond());
         }
 
         //region Getters and Setters

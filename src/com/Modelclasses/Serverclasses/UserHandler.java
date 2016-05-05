@@ -94,7 +94,14 @@ public class UserHandler implements Runnable, Serializable
             try
             {
                 Message m = (Message) this.IN.readObject();
-                handleMessage(m);
+                if(!Server.isIsServerShutdownInitiated())
+                {
+                    handleMessage(m);
+                }
+                else
+                {
+                    disconnect("Server is shutting down");
+                }
             }
             catch (IOException e)
             {
@@ -127,7 +134,7 @@ public class UserHandler implements Runnable, Serializable
         ApplicationUser user;
         if(message instanceof LoginMessage)
         {
-            System.out.println("LoginMessage");
+            //System.out.println("LoginMessage");
             user = new ApplicationUser(message.getUsername(), ((LoginMessage) message).getPassword());
 
             this.authenticated = this.loginAttempt(user);
@@ -143,7 +150,7 @@ public class UserHandler implements Runnable, Serializable
         }
         else if(message instanceof RegisterMessage)
         {
-            System.out.println("RegisterMessage");
+            //System.out.println("RegisterMessage");
             user = new ApplicationUser(message.getUsername(), message.getUsername());
 
             this.authenticated = registerNewUser(user);
@@ -158,16 +165,16 @@ public class UserHandler implements Runnable, Serializable
         }
         else if(message instanceof DisconnectMessage)
         {
-            System.out.println("DisconnectMessage");
+            //System.out.println("DisconnectMessage");
             DBhandlerSingleton.getInstance().log(LogEvents.Disconnect, new ApplicationUser(message.getUsername(), null));
             disconnect("Disconnect request");
         }
         else if(message instanceof RequestMessage)
         {
-            System.out.println("RequestMessage");
+            //System.out.println("RequestMessage");
             GPSCoordMessage gpsCoords = ((RequestMessage) message).getGpsCoords();
             handler.putData(gpsCoords);
-            handler.printMap();
+            //handler.printMap();
 
             if(handler.getOUTER_BOX().isInsideBox(new GpsCoordinates(gpsCoords.getLatitude(), gpsCoords.getLongitude())))
             {
