@@ -20,10 +20,10 @@ public class LoginServer implements Runnable
     private final GpsDataHandler handler;
     private boolean runServer;
 
-    LoginServer(int poolSize, int port, GpsDataHandler handler) throws IOException
+    LoginServer(int port, GpsDataHandler handler) throws IOException
     {
         this.socket = new ServerSocket(port);
-        this.pool = Executors.newFixedThreadPool(poolSize);
+        this.pool = Executors.newCachedThreadPool();
         this.handler = handler;
         this.runServer = true;
     }

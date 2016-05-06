@@ -22,6 +22,7 @@ public class Server
     private SensorDataHandler sensorDataHandler;
     private final Janitor janitor;
 
+
     public Server()
     {
         this.gpsDataHandler = new GpsDataHandler();
@@ -36,11 +37,10 @@ public class Server
     {
         try
         {
-            (new Thread(this.loginServer = new LoginServer(5, 9058, gpsDataHandler))).start();
-            //janitor.startCleanupThread();
+            (new Thread(this.loginServer = new LoginServer(9058, gpsDataHandler))).start();
+            janitor.startCleanupThread();
             System.out.println("Type 'quit', 'shutdown' or 'exit' to initiate shutdown");
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-
 
             String line = "";
             while(!line.equalsIgnoreCase("quit") && !line.equalsIgnoreCase("shutdown") && !line.equalsIgnoreCase("exit")){

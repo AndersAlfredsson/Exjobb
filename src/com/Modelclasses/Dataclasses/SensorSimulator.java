@@ -6,4 +6,8 @@ package com.Modelclasses.Dataclasses;
 public class SensorSimulator
 {
 
+    public SensorSimulator()
+    {
+
+    }
 }
