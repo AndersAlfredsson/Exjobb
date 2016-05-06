@@ -37,7 +37,7 @@ public class Server
         try
         {
             (new Thread(this.loginServer = new LoginServer(5, 9058, gpsDataHandler))).start();
-            janitor.startCleanupThread();
+            //janitor.startCleanupThread();
             System.out.println("Type 'quit', 'shutdown' or 'exit' to initiate shutdown");
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 

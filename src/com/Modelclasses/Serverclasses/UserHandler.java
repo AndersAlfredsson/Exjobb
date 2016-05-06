@@ -92,7 +92,7 @@ public class UserHandler implements Runnable, Serializable
     public void run()
     {
         this.connected = true;
-        System.out.println("Client connected...");
+        //System.out.println("Client connected...");
         while(this.connected)
         {
             try
@@ -155,7 +155,7 @@ public class UserHandler implements Runnable, Serializable
         else if(message instanceof RegisterMessage)
         {
             //System.out.println("RegisterMessage");
-            user = new ApplicationUser(message.getUsername(), message.getUsername());
+            user = new ApplicationUser(message.getUsername(), ((RegisterMessage) message).getPassword());
 
             this.authenticated = registerNewUser(user);
             if(!this.authenticated)
@@ -190,7 +190,7 @@ public class UserHandler implements Runnable, Serializable
             }
             else
             {
-                sendMessage(new ServerMessage(ServerMessageType.SensorData, null));
+                sendMessage(new ServerMessage(ServerMessageType.SensorData,(Object)null));
             }
         }
     }
@@ -222,13 +222,11 @@ public class UserHandler implements Runnable, Serializable
     {
         try
         {
-            System.out.println("Disconnect sent");
             sendMessage(new ServerMessage(ServerMessageType.Disconnect, reason));
             this.OUT.flush();
             this.SOCKET.close();
             this.connected = false;
             this.authenticated = false;
-            System.out.println("Disconnect successful");
             return true;
         }
         catch (IOException e)
@@ -265,10 +263,11 @@ public class UserHandler implements Runnable, Serializable
     private boolean loginAttempt(ApplicationUser user)
     {
         ApplicationUser dbUser = DBhandlerSingleton.getInstance().getUser(user.getEmail());
-
         if(dbUser != null)
         {
-            if(PasswordSecurity.authenticate(user, dbUser))
+            boolean test = PasswordSecurity.authenticate(user, dbUser);
+            System.out.println(test);
+            if(test)
             {
                 System.out.println("Login Successful");
                 DBhandlerSingleton.getInstance().log(LogEvents.SuccessfulLoginAttempt, user);

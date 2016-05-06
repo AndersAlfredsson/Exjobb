@@ -33,25 +33,13 @@ public class PasswordSecurity
      */
     public static boolean hashPassword(ApplicationUser user)
     {
-        try
-        {
-            byte[] password = user.getPassword().getBytes();
-            byte[] salt = generateSalt();
-            byte[] concatenated = concatenateArrays(password, salt);
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = messageDigest.digest(concatenated);
-            messageDigest.reset();
-
-            String s = convertToString(salt);
-            user.setPassword(convertToString(hash));
-            user.setSalt(s);
-            return true;
-        }
-        catch (NoSuchAlgorithmException e)
-        {
-            e.printStackTrace();
-            return false;
-        }
+        byte[] password = user.getPassword().getBytes();
+        byte[] salt = generateSalt();
+        byte[] hash = hash(password, salt);
+        String s = convertToString(salt);
+        user.setPassword(convertToString(hash));
+        user.setSalt(s);
+        return true;
     }
 
     /**
@@ -61,25 +49,32 @@ public class PasswordSecurity
      */
     private static boolean hashPasswordWithExistingSalt(ApplicationUser user)
     {
+        byte[] password = user.getPassword().getBytes();
+
+        byte[] salt = convertToByte(user.getSalt());
+        byte[] hash = hash(password, salt);
+
+        String s = convertToString(salt);
+        user.setPassword(convertToString(hash));
+        user.setSalt(s);
+        return true;
+    }
+
+    private static byte[] hash(byte[] password, byte[] salt)
+    {
+        byte[] concatenated = concatenateArrays(password, salt);
+        MessageDigest messageDigest = null;
         try
         {
-            byte[] password = user.getPassword().getBytes();
-            byte[] salt = convertToByte(user.getSalt());
-            byte[] concatenated = concatenateArrays(password, salt);
-            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = messageDigest.digest(concatenated);
-            messageDigest.reset();
-
-            String s = convertToString(salt);
-            user.setPassword(convertToString(hash));
-            user.setSalt(s);
-            return true;
+            messageDigest = MessageDigest.getInstance("SHA-256");
         }
-        catch (NoSuchAlgorithmException e)
-        {
+        catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
-            return false;
         }
+        byte[] hash = messageDigest.digest(concatenated);
+        messageDigest.reset();
+        return hash;
+
     }
 
     /**
@@ -132,13 +127,17 @@ public class PasswordSecurity
         user.setSalt(DbUser.getSalt());
         hashPasswordWithExistingSalt(user);
         String pw = user.getPassword();
-        if(/*DbUser.getPassword().equals(pw) && */DbUser.getEmail().equals(user.getEmail()))
+        System.out.println(pw);
+        System.out.println(DbUser.getPassword());
+        if(DbUser.getPassword().equals(pw) && DbUser.getEmail().equals(user.getEmail()))
         {
             //System.out.println("Success!");
+            pw = "";
             return true;
         }
         else
         {
+            pw = "";
             //System.out.println("Failure!");
             return false;
         }

@@ -30,7 +30,7 @@ public class LoginServer implements Runnable
 
     /**
      * Function for shutting down the executorService, it waits for all threads to complete
-     * their computations for 20 seconds, if unsuccessful it waits for 20 more seconds and then
+     * their computations for 60 seconds, if unsuccessful it waits for 60 more seconds and then
      * forcing them to quit.
      * @param pool
      */
