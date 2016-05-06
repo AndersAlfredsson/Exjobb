@@ -3,7 +3,12 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -12,12 +17,9 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.DialogTitle;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.widget.TextView;
 
 import org.osmdroid.api.IMapController;
@@ -33,6 +35,7 @@ import org.osmdroid.views.overlay.mylocation.IMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 import com.exjobbandroidapplication.Network.ConnectionHandler;
 import com.exjobbandroidapplication.R;
+
 import java.util.ArrayList;
 import Enums.ServerMessageType;
 import NetworkMessages.GPSCoordMessage;
@@ -42,7 +45,6 @@ import NetworkMessages.ServerMessage;
 
 public class osmtest extends AppCompatActivity {
     private osmtest activity = this;
-    private GeoPoint myLocation = new GeoPoint(59.2542299, 15.2476963);
     private ArrayList<Polygon> campusSections = new ArrayList<>();
     private MapView map;
     private long lastMessageTime = 0;
@@ -51,30 +53,23 @@ public class osmtest extends AppCompatActivity {
     private GpsMyLocationProvider gpsMyLocationProvider;
     private MyLocationNewOverlay myLocationNewOverlay;
     private int iconOverlayIndex;
-
-    private final String tag = "OSMclass";
+    private final GeoPoint SECTION_ONE_COORDINATES  = new GeoPoint(59.254132, 15.246469);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Hides the titlebar.
+        //Hide the titlebar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.hide();
         }
-
-
-
 
         setContentView(R.layout.activity_osmtest);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setupMapView();
         myLocationNewOverlay = new MyLocationNewOverlay(map);
         gpsMyLocationProvider = new GpsMyLocationProvider(this);
-
-        askForStoragePermission();
-        askForGPSPermission();
         setupCampusSections();
 
         myLocationNewOverlay.enableMyLocation();
@@ -104,7 +99,6 @@ public class osmtest extends AppCompatActivity {
                         Log.d("GPS", "Sending message");
                         SendGPSTask sendGPSTask = new SendGPSTask(location);
                         sendGPSTask.execute();
-                        myLocation = new GeoPoint(location);
                     }
                     else{
                         Log.d("GPS", "Not enough time has passed since last update");
@@ -119,7 +113,7 @@ public class osmtest extends AppCompatActivity {
         map.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                return false;
+                return true;
             }
         });
     }
@@ -128,6 +122,9 @@ public class osmtest extends AppCompatActivity {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.openstreetmap.org/copyright")));
     }
 
+    /**
+     * Setup the MapView to center on the campus area and lock the zoom level to 18.
+     */
     private void setupMapView() {
         map = (MapView) findViewById(R.id.map);
         map.setTileSource(TileSourceFactory.MAPNIK);
@@ -137,6 +134,10 @@ public class osmtest extends AppCompatActivity {
         mapController.setZoom(18);
     }
 
+    /**
+     *
+     * @return
+     */
     private boolean isTimeToSendMessage() {
         currentTime = System.currentTimeMillis();
         if (lastMessageTime == 0) {
@@ -153,51 +154,50 @@ public class osmtest extends AppCompatActivity {
     }
 
     /**
-     * Ask user for permission to store data on device and to use the GPS.
-     */
-    private void askForStoragePermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-    }
-
-    private void askForGPSPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-    }
-
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                } else {
-                }
-                return;
-            }
-        }
-    }
-
-    /**
      * Displays a marker for every set of coordinates received from the server.
+     * Also displays the number of estimated people in a section.
      * @param list
      */
-    private void displayGPSCoordinates(ArrayList<GpsCoordinates> list){
+    private void displayGPSCoordinates(ArrayList<GpsCoordinates> list, int peopleInSection){
         ArrayList<OverlayItem> markerList = new ArrayList<>();
-        if (list == null  ||list.size() < 1) {
-            return;
+        if (list == null  || list.size() < 1) {
+            for (GpsCoordinates gpsCoordinates : list) {
+                OverlayItem currentLocMarker = new OverlayItem(Double.toString(gpsCoordinates.getLatitude()), Double.toString(gpsCoordinates.getLongitude()), new GeoPoint(gpsCoordinates.getLatitude(), gpsCoordinates.getLongitude()));
+                Drawable marker = getResources().getDrawable(R.drawable.person);
+                currentLocMarker.setMarker(marker);
+                markerList.add(currentLocMarker);
+            }
         }
-        for (GpsCoordinates gpsCoordinates : list) {
-            Log.d("GPS", "New object" + gpsCoordinates.toString());
-            OverlayItem currentLocMarker = new OverlayItem(Double.toString(gpsCoordinates.getLatitude()) , Double.toString(gpsCoordinates.getLongitude()), new GeoPoint(gpsCoordinates.getLatitude(), gpsCoordinates.getLongitude()));
-            Drawable marker = getResources().getDrawable(R.drawable.person);
-            currentLocMarker.setMarker(marker);
-            markerList.add(currentLocMarker);
-            Log.d("GPS", "markerlist size:" + Integer.toString(markerList.size()));
-        }
+
+        //Display the number of people in section.
+        OverlayItem textOverlayItem = new OverlayItem("123123" , "33", SECTION_ONE_COORDINATES);
+        Drawable textMarker = writeOnDrawable(R.mipmap.text_marker, Integer.toString(peopleInSection));
+        textOverlayItem.setMarker(textMarker);
+        markerList.add(textOverlayItem);
+
         ItemizedIconOverlay<OverlayItem> itemItemizedIconOverlay = new ItemizedIconOverlay<>(markerList, null, activity);
         if (map.getOverlays().size() > iconOverlayIndex) {
             map.getOverlays().remove(iconOverlayIndex);
         }
         map.getOverlays().add(itemItemizedIconOverlay);
         map.invalidate();
+    }
+
+    /**
+     * Method takes a marker and returns the marker with the specified text written on it.
+     * @param drawableId
+     * @param text
+     * @return
+     */
+    private BitmapDrawable writeOnDrawable(int drawableId, String text){
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId).copy(Bitmap.Config.ARGB_8888, true);
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(140);
+        Canvas canvas = new Canvas(bm);
+        canvas.drawText(text, 0, bm.getHeight()/2, paint);
+        return new BitmapDrawable(bm);
     }
 
     /**
@@ -222,6 +222,9 @@ public class osmtest extends AppCompatActivity {
         campusSections.add(polygon);
     }
 
+    /**
+     * Asynchronous task that sends a message to the server and handles the
+     */
     class SendGPSTask extends AsyncTask<Void, Void, Boolean> {
         Location location;
 
@@ -234,26 +237,23 @@ public class osmtest extends AppCompatActivity {
             GPSCoordMessage message = new GPSCoordMessage(ConnectionHandler.getInstance().geteMail(), location.getLatitude(),location.getLongitude());
             ServerMessage serverMessage = ConnectionHandler.getInstance().sendMessage(new RequestMessage(message));
 
+            //TODO : om man ska inte ska få någon data från servern skall null, null skickas. Detta måste hanteras och kanske skrivas ut i appen.
             if (serverMessage == null) {
+                Log.d("serverMessage", "Received message is null");
                 return false;
             }
 
             if (serverMessage != null && serverMessage.getMessageType() == ServerMessageType.SensorData) {
                 final ArrayList<GpsCoordinates> list = (ArrayList) serverMessage.getMessage();
-                final ArrayList<GpsCoordinates> fakelist = new ArrayList<>();
-                fakelist.add(new GpsCoordinates(59.254466, 15.245775));
-                fakelist.add(new GpsCoordinates(59.254463, 15.246934));
-                fakelist.add(new GpsCoordinates(59.254115, 15.246945));
+                final int peopleInSection = serverMessage.getAmount();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        displayGPSCoordinates(list);
+                        displayGPSCoordinates(list, peopleInSection);
                     }
                 });
                 Log.d("GPS", "Received sensor data, running displayGPSCoordinates()");
             }
-
-            //TODO : ska göras räättt..vad händer om vi inte får tillbaka något från servern?
             return true;
         }
 
@@ -270,3 +270,4 @@ public class osmtest extends AppCompatActivity {
         }
     }
 }
+//TODO : Fixa så att det ser bra ut på telefoner med lägre upplösning.

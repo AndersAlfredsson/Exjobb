@@ -1,26 +1,24 @@
 package com.exjobbandroidapplication.Activities;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 
-import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.ContactsContract;
-import android.text.Editable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -32,13 +30,11 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.exjobbandroidapplication.Network.ConnectionHandler;
 import com.exjobbandroidapplication.R;
 import com.exjobbandroidapplication.Resources.inputCheck;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,12 +47,6 @@ import NetworkMessages.ServerMessage;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
-
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
-
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -65,7 +55,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
-    private EditText mPasswordrepeatView;
+    private EditText mPasswordRepeatView;
     private View mProgressView;
     private View mLoginFormView;
     private boolean registrationMode = false;
@@ -73,7 +63,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private Button backButton;
     private LoginActivity loginActivity = this;
 
-
+    //Dangerous permissions user needs to grant.
+    private final String[] PERMISSIONS = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +75,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+
+        //Check if the user has given permissions.
+        if(!hasPermissions(this, PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, 0);
+        }
+        //TODO : Kör igång platstjänster innan man får logga in.
+        //TODO : Sätt zoomlevel på kartan beroende på användarens upplösning??
+        //TODO : Man ska inte kunna logga in om man inte gett tillstånd till GPS och lagring.
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -97,9 +96,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
-        mPasswordrepeatView = (EditText) findViewById(R.id.passwordrepeat);
-        mPasswordrepeatView.setVisibility(View.GONE);
-        Editable text = mPasswordrepeatView.getText();
+        mPasswordRepeatView = (EditText) findViewById(R.id.passwordrepeat);
+        mPasswordRepeatView.setVisibility(View.GONE);
+        //Editable text = mPasswordRepeatView.getText();
 
         mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
@@ -130,6 +129,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mProgressView = findViewById(R.id.login_progress);
     }
 
+
+    //TODO : fixa så att permissions frågas efter som de ska.
+    /**
+     *
+     * @param context
+     * @param permissions
+     * @return
+     */
+    private boolean hasPermissions(Context context, String[] permissions) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && context != null && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     /**
      * Callback received when a permissions request has been completed.
      */
@@ -141,9 +159,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private void backPressed() {
         backButton.setVisibility(View.GONE);
         registrationMode = false;
-        mPasswordrepeatView.setVisibility(View.GONE);
+        mPasswordRepeatView.setVisibility(View.GONE);
         mEmailSignInButton.setVisibility(View.VISIBLE);
-        mPasswordrepeatView.setText("");
+        mPasswordRepeatView.setText("");
     }
 
     private void registrationPressed() {
@@ -153,7 +171,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         else {
             registrationMode = true;
             mEmailSignInButton.setVisibility(View.GONE);
-            mPasswordrepeatView.setVisibility(View.VISIBLE);
+            mPasswordRepeatView.setVisibility(View.VISIBLE);
             backButton.setVisibility(View.VISIBLE);
         }
     }
@@ -179,12 +197,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
-        mPasswordrepeatView.setError(null);
+        mPasswordRepeatView.setError(null);
 
         // Store values at the time of the login attempt.
         String email = mEmailView.getText().toString();
         String password1 = mPasswordView.getText().toString();
-        String password2 = mPasswordrepeatView.getText().toString();
+        String password2 = mPasswordRepeatView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -271,30 +289,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        List<String> emails = new ArrayList<>();
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
-            //emails.add(cursor.getString(ProfileQuery.ADDRESS));
             cursor.moveToNext();
         }
-
-        addEmailsToAutoComplete(emails);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
 
     }
-
-    private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
-        //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<>(LoginActivity.this,
-                        android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
-
-        mEmailView.setAdapter(adapter);
-    }
-
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
@@ -318,7 +322,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             if (registrationMode){
                 ConnectionHandler.getInstance().seteMail(mEmail);
                 final ServerMessage serverMessage = ConnectionHandler.getInstance().sendMessage(new RegisterMessage(mEmail, mPassword));
-
+                if (serverMessage == null) {
+                    Log.d("serverMessage", "De e inte najs!");
+                }
                 if (serverMessage.getMessageType() == ServerMessageType.Authenticated){
                     registrationMode = false;
                     return true;
@@ -358,9 +364,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                //Gå till mapskärmen.
-//                Intent mapActivityIntent = new Intent(loginActivity, CampusMapActivity.class);
-//                startActivity(mapActivityIntent);
                 Intent plupp = new Intent(loginActivity,osmtest.class);
                 startActivity(plupp);
             } else {
