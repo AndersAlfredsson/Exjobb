@@ -6,6 +6,7 @@ import com.Modelclasses.ApplicationUser;
 import com.Modelclasses.Dataclasses.BoundingBox;
 import com.Modelclasses.Dataclasses.SensorDataHandler;
 import com.Modelclasses.PasswordSecurity;
+import com.Modelclasses.Sensorclasses.ClientSensors;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,8 +20,10 @@ public class SocketTest
 {
     public static void main(String[] args)
     {
-        Connect();
+        ClientSensors s = new ClientSensors(new SensorDataHandler());
     }
+
+
 
     public static void test()
     {
@@ -50,17 +53,6 @@ public class SocketTest
         //System.out.println("outer: " + outer.isInsideBox(g));
     }
 
-    public static void TestSensorDataHandler()
-    {
-        SensorDataHandler data = new SensorDataHandler();
-        data.addSection(1,2,3,4);
-        data.addPersonToSection(1);
-        data.addPersonToSection(2);
-        data.addPersonToSection(3);
-        data.addPersonToSection(4);
-        data.printSections();
-
-    }
 
     private static void Connect()
     {

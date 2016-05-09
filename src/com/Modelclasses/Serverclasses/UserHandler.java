@@ -190,7 +190,7 @@ public class UserHandler implements Runnable, Serializable
             }
             else
             {
-                sendMessage(new ServerMessage(ServerMessageType.SensorData,(Object)null));
+                sendMessage(new ServerMessage(ServerMessageType.SensorData,(Object)null, (Object) null));
             }
         }
     }

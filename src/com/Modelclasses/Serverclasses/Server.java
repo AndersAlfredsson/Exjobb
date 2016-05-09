@@ -27,7 +27,8 @@ public class Server
     {
         this.gpsDataHandler = new GpsDataHandler();
         this.sensorDataHandler = new SensorDataHandler();
-        this.janitor = new Janitor(gpsDataHandler, sensorDataHandler, 3, 1);
+        this.janitor = new Janitor(gpsDataHandler, sensorDataHandler, 3, 2);
+
     }
 
     /**

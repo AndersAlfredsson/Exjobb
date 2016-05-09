@@ -8,87 +8,35 @@ import java.util.ArrayList;
  */
 public class Section
 {
-    private String name;
-    private int numPeople;
-    private ArrayList<Integer> sensorList;
-
-    /**
-     * Default constructor
-     */
-    public Section()
+    private int id;
+    private int amount;
+    public Section(int id)
     {
-        this.numPeople = 0;
-        this.sensorList = new ArrayList<>();
-        name = "";
+        this.amount = 0;
+        this.id = id;
+    }
+    public void increment()
+    {
+        this.amount++;
+    }
+    public void decrement()
+    {
+        this.amount--;
     }
 
-    /**
-     * Adds a sensor to the list, checks if it is already added first
-     * @param id
-     */
-    public void addSensor(int id)
-    {
-        if(!isInList(id))
-        {
-            sensorList.add(id);
-            name += id;
-        }
+    public int getId() {
+        return id;
     }
 
-    /**
-     * Overridden toString function
-     * @return
-     */
-    @Override
-    public String toString()
-    {
-        return "name: " + name + ", amount: " + this.numPeople;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    /**
-     * Rerurns the list with all the sensors
-     * @return
-     */
-    public ArrayList<Integer> getSensorList()
-    {
-        return this.sensorList;
+    public int getAmount() {
+        return amount;
     }
 
-    /**
-     * Adds a person to the section
-     */
-    public void addPeople()
-    {
-        this.numPeople++;
-    }
-
-    /**
-     * Removes a person from the section
-     */
-    public boolean removePeople()
-    {
-        if(numPeople > 0)
-        {
-            this.numPeople--;
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Checks if the sensor has already been added to the list
-     * @param id
-     * @return
-     */
-    private boolean isInList(int id)
-    {
-        for(int i : this.sensorList)
-        {
-            if(i == id)
-            {
-                return true;
-            }
-        }
-        return false;
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 }

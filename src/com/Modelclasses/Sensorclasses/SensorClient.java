@@ -9,12 +9,13 @@ import java.net.Socket;
 
 /**
  * Created by Gustav on 2016-05-06.
+ *
  */
-public class SensorClient
+public class SensorClient implements Runnable
 {
     // COMPUTER MUST BE ON GUESTNET!
     private Socket socket;
-    private final String IP_ADDRESS = "127.0.0.1";
+    private String IP_ADDRESS = "127.0.0.1";
     private final int PORT = 2390;
     private InputStreamReader IN;
     private boolean isConnected;
@@ -28,7 +29,7 @@ public class SensorClient
     //TODO
     //TODO
 
-    public SensorClient(SensorDataHandler dataHandler)
+    public SensorClient(SensorDataHandler dataHandler, String IP)
     {
         try
         {
@@ -37,7 +38,7 @@ public class SensorClient
             socket = new Socket(address, PORT);
             IN = new InputStreamReader(socket.getInputStream());
             this.dataHandler = dataHandler;
-            runClient();
+            this.IP_ADDRESS = IP;
 
         } catch (IOException e)
         {
@@ -45,32 +46,22 @@ public class SensorClient
         }
     }
 
-    public void runClient()
+    @Override
+    public void run()
     {
         isConnected = true;
-        Thread thread = new Thread(() -> {
-            while(isConnected)
-            {
-                try
-                {
-                    int message = IN.read();
-                    if(message == 0)
-                    {
-                        disconnect();
-                    }
-                    else
-                    {
-                        dataHandler.addPersonToSection(message);
-                    }
+        while(isConnected) {
+            try {
+                int message = IN.read();
+                if (message == 0) {
+                    disconnect();
+                } else {
+                    //dataHandler.addPersonToSection(message);
                 }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        });
-        thread.setDaemon(true);
-        thread.start();
+        }
     }
 
     private void disconnect()
