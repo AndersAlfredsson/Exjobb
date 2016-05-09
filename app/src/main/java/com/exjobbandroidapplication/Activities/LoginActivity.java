@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +31,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.exjobbandroidapplication.Network.ConnectionHandler;
 import com.exjobbandroidapplication.R;
@@ -80,14 +82,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, 0);
         }
-        //TODO : Kör igång platstjänster innan man får logga in.
         //TODO : Sätt zoomlevel på kartan beroende på användarens upplösning??
-        //TODO : Man ska inte kunna logga in om man inte gett tillstånd till GPS och lagring.
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
@@ -129,8 +130,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mProgressView = findViewById(R.id.login_progress);
     }
 
-
-    //TODO : fixa så att permissions frågas efter som de ska.
     /**
      *
      * @param context
@@ -176,12 +175,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private void showLogin() {
-
-    }
-
-    private void showRegistration() {
-
+    private boolean isGPSEnabled() {
+        LocationManager locationManager = (LocationManager)(this.getSystemService(LOCATION_SERVICE));
+        boolean gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        Log.d("GPS: ", Boolean.toString(gpsEnabled));
+        return gpsEnabled;
     }
 
     /**
@@ -191,6 +189,16 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      */
     private void attemptLogin() {
         if (mAuthTask != null) {
+            return;
+        }
+        // Check if the GPS is enabled. If it isn´t display a toast with information.
+        if (!isGPSEnabled()) {
+            Toast.makeText(loginActivity, "GPS has to be enabled before login!", Toast.LENGTH_LONG).show();
+            return;
+        }
+        //Check if the user has given permissions.
+        if(!hasPermissions(this, PERMISSIONS)){
+            ActivityCompat.requestPermissions(this, PERMISSIONS, 0);
             return;
         }
 
@@ -316,14 +324,23 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            ConnectionHandler.getInstance().connectToServer();
+            if (!ConnectionHandler.getInstance().connectToServer()) {runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(loginActivity, "Could not connect to server", Toast.LENGTH_LONG).show();
+                }
+            });
+
+                return false;
+            }
+
             ConnectionHandler.getInstance().seteMail(mEmail);
 
             if (registrationMode){
                 ConnectionHandler.getInstance().seteMail(mEmail);
                 final ServerMessage serverMessage = ConnectionHandler.getInstance().sendMessage(new RegisterMessage(mEmail, mPassword));
                 if (serverMessage == null) {
-                    Log.d("serverMessage", "De e inte najs!");
+                    Log.d("serverMessage", "serverMessage is null");
                 }
                 if (serverMessage.getMessageType() == ServerMessageType.Authenticated){
                     registrationMode = false;
@@ -364,11 +381,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                Intent plupp = new Intent(loginActivity,osmtest.class);
-                startActivity(plupp);
+                Intent loginIntent = new Intent(loginActivity,osmtest.class);
+                startActivity(loginIntent);
             } else {
-                mPasswordView.setError(getString(R.string.error_incorrect_password));
-                mPasswordView.requestFocus();
+                Log.d("LoginError", "Error when trying to login or connect to server");
             }
         }
 

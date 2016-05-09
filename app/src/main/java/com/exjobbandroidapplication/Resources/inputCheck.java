@@ -27,8 +27,7 @@ public class inputCheck {
      * @return
      */
     public static boolean isPasswordValid(String password) {
-        //TODO: Ändra till längre lösenord.
-        return password.length() > 2;
+        return password.length() > 5;
     }
 
     /**

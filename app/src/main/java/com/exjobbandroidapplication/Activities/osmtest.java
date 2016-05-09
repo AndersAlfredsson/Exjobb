@@ -158,7 +158,7 @@ public class osmtest extends AppCompatActivity {
      * Also displays the number of estimated people in a section.
      * @param list
      */
-    private void displayGPSCoordinates(ArrayList<GpsCoordinates> list, int peopleInSection){
+    private void displayGPSCoordinates(ArrayList<GpsCoordinates> list, Object peopleInSection){
         ArrayList<OverlayItem> markerList = new ArrayList<>();
         if (list == null  || list.size() < 1) {
             for (GpsCoordinates gpsCoordinates : list) {
@@ -169,11 +169,12 @@ public class osmtest extends AppCompatActivity {
             }
         }
 
+        //TODO : hantera data för antal personer i en sektion.
         //Display the number of people in section.
-        OverlayItem textOverlayItem = new OverlayItem("123123" , "33", SECTION_ONE_COORDINATES);
-        Drawable textMarker = writeOnDrawable(R.mipmap.text_marker, Integer.toString(peopleInSection));
-        textOverlayItem.setMarker(textMarker);
-        markerList.add(textOverlayItem);
+        //OverlayItem textOverlayItem = new OverlayItem("123123" , "33", SECTION_ONE_COORDINATES);
+        //Drawable textMarker = writeOnDrawable(R.mipmap.text_marker, Integer.toString(peopleInSection));
+        //textOverlayItem.setMarker(textMarker);
+        //markerList.add(textOverlayItem);
 
         ItemizedIconOverlay<OverlayItem> itemItemizedIconOverlay = new ItemizedIconOverlay<>(markerList, null, activity);
         if (map.getOverlays().size() > iconOverlayIndex) {
@@ -244,12 +245,15 @@ public class osmtest extends AppCompatActivity {
             }
 
             if (serverMessage != null && serverMessage.getMessageType() == ServerMessageType.SensorData) {
+                if (serverMessage.getMessage() == null && serverMessage.getSensorData() == null) {
+                    Log.d("Received message", "information is null, user outside of bounding box or GPS turned of");
+                }
                 final ArrayList<GpsCoordinates> list = (ArrayList) serverMessage.getMessage();
-                final int peopleInSection = serverMessage.getAmount();
+                //final int peopleInSection = serverMessage.getSensorData();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        displayGPSCoordinates(list, peopleInSection);
+                        displayGPSCoordinates(list, null);
                     }
                 });
                 Log.d("GPS", "Received sensor data, running displayGPSCoordinates()");

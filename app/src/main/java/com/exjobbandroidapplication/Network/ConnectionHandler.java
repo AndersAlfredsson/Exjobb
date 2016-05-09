@@ -6,7 +6,9 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 
 import Enums.ServerMessageType;
 import NetworkMessages.DisconnectMessage;
@@ -22,7 +24,7 @@ public class ConnectionHandler {
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
     private boolean connected = false;
-    private final String IPADRESS = "10.22.14.67";
+    private final String IPADRESS = "10.22.16.68";
     private final int PORTNR = 9058;
     private String eMail;
     private ServerMessage receivedMessage = null;
@@ -59,24 +61,22 @@ public class ConnectionHandler {
         if (serverMessage.getMessageType() == ServerMessageType.Disconnect) {
             closeStreams();
         }
-        //TODO : lägg till en timeout för guds skull!!!!!
     }
 
     /**
      * Connects to the server using the specified emailaddress and password.
      */
     public boolean connectToServer(){
-        boolean successful = false;
         try {
-            socket = new Socket(IPADRESS, PORTNR);
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(IPADRESS, PORTNR), 5000);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(socket.getInputStream());
-            successful = true;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.d("connectToserver return:", successful + "");
-        return successful;
+        Log.d("connectToserver return:", socket.isConnected() + "");
+        return socket.isConnected();
     }
 
 
