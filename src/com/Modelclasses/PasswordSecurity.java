@@ -31,7 +31,7 @@ public class PasswordSecurity
      * @param user
      * @return
      */
-    public static boolean hashPassword(ApplicationUser user)
+    public static void hashPassword(ApplicationUser user)
     {
         byte[] password = user.getPassword().getBytes();
         byte[] salt = generateSalt();
@@ -39,7 +39,6 @@ public class PasswordSecurity
         String s = convertToString(salt);
         user.setPassword(convertToString(hash));
         user.setSalt(s);
-        return true;
     }
 
     /**
@@ -47,17 +46,15 @@ public class PasswordSecurity
      * @param user
      * @return
      */
-    private static boolean hashPasswordWithExistingSalt(ApplicationUser user)
+    private static void hashPasswordWithExistingSalt(ApplicationUser user)
     {
         byte[] password = user.getPassword().getBytes();
-
         byte[] salt = convertToByte(user.getSalt());
         byte[] hash = hash(password, salt);
 
         String s = convertToString(salt);
         user.setPassword(convertToString(hash));
         user.setSalt(s);
-        return true;
     }
 
     private static byte[] hash(byte[] password, byte[] salt)

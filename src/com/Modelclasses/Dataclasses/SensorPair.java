@@ -1,6 +1,8 @@
 package com.Modelclasses.Dataclasses;
 
 
+import NetworkMessages.Section;
+
 /**
  * Created by Gustav on 2016-05-09.
  */
@@ -60,22 +62,25 @@ public class SensorPair
         }
     }
 
-    public void sensorPairTriggered(int expected)
+    public synchronized void sensorPairTriggered(int expected)
     {
         if(expected == innerSensor)
         {
             innerSection.increment();
-            if(neighboringSection != null)
+            if(neighboringSection != null && neighboringSection.getAmount() > 0)
             {
                 neighboringSection.decrement();
             }
         }
         else
         {
-            innerSection.decrement();
-            if(neighboringSection != null)
+            if(innerSection.getAmount() > 0)
             {
-                neighboringSection.increment();
+                innerSection.decrement();
+                if(neighboringSection != null)
+                {
+                    neighboringSection.increment();
+                }
             }
         }
     }
@@ -83,6 +88,14 @@ public class SensorPair
     @Override
     public String toString()
     {
-        return this.innerSensor + " - " + this.outerSensor;
+        if(this.neighboringSection == null)
+        {
+            return this.innerSensor + " - " + this.outerSensor + ", " + this.innerSection.toString() + ", null";
+        }
+        else
+        {
+            return this.innerSensor + " - " + this.outerSensor + ", " + this.innerSection.toString() + ", " + this.neighboringSection.toString();
+        }
+
     }
 }

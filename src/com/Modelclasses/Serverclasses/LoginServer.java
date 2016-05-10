@@ -1,6 +1,8 @@
 package com.Modelclasses.Serverclasses;
 
 import com.Modelclasses.Dataclasses.GpsDataHandler;
+import com.Modelclasses.Dataclasses.Sensor;
+import com.Modelclasses.Dataclasses.SensorDataHandler;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -18,14 +20,16 @@ public class LoginServer implements Runnable
     private final ExecutorService pool;
     private final ServerSocket socket;
     private final GpsDataHandler handler;
+    private final SensorDataHandler sensorDataHandler;
     private boolean runServer;
 
-    LoginServer(int port, GpsDataHandler handler) throws IOException
+    LoginServer(int port, GpsDataHandler handler, SensorDataHandler sensorDataHandler) throws IOException
     {
         this.socket = new ServerSocket(port);
         this.pool = Executors.newCachedThreadPool();
         this.handler = handler;
         this.runServer = true;
+        this.sensorDataHandler = sensorDataHandler;
     }
 
     /**
@@ -72,7 +76,7 @@ public class LoginServer implements Runnable
         {
             try
             {
-                pool.execute(new UserHandler(this.socket.accept(), this.handler));
+                pool.execute(new UserHandler(this.socket.accept(), this.handler, this.sensorDataHandler));
             }
             catch (IOException e)
             {

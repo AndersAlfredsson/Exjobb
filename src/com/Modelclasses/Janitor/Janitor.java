@@ -41,7 +41,7 @@ public class Janitor
     {
         this.runCleanup = true;
         long gpsTimeInterval = 1000 * 60 * this.GPS_CLEANUP_INTERVAL; //minutes -> milliseconds
-        long sensorTimeInterval = 1000 * this.SENSOR_CLEANUP_INTERVAL; // minutes -> milliseconds
+        long sensorTimeInterval = 1000 * 60 * this.SENSOR_CLEANUP_INTERVAL; // minutes -> milliseconds
         System.out.println("Janitor started...");
 
         Thread gpsCleanUpThread = new Thread(() -> {
@@ -66,8 +66,7 @@ public class Janitor
 
         Thread sensorCleanUpThread = new Thread(() ->
         {
-            System.out.println("SensorCleanupThread started...");
-            sensorDataHandler.newValue(1);
+            //System.out.println("SensorCleanupThread started...");
             while(this.runCleanup)
             {
                 try
@@ -75,9 +74,9 @@ public class Janitor
                     Thread.sleep(sensorTimeInterval);
                     if(sensorDataHandler.getExpectedSize() > 0)
                     {
-                        System.out.println("Sensor data cleanup started...");
+                        //System.out.println("Sensor data cleanup started...");
                         sensorDataHandler.cleanup();
-                        System.out.println("Sensor data cleanup finished...");
+                        //System.out.println("Sensor data cleanup finished...");
                     }
                 }
                 catch (InterruptedException e)

@@ -4,6 +4,7 @@ import com.DBcommunication.DBhandlerSingleton;
 import com.Modelclasses.Dataclasses.GpsDataHandler;
 import com.Modelclasses.Dataclasses.SensorDataHandler;
 import com.Modelclasses.Janitor.Janitor;
+import com.Modelclasses.Sensorclasses.ClientSensors;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,16 +18,18 @@ import java.sql.SQLException;
 public class Server
 {
     private static boolean isServerShutdown = false;
-    private GpsDataHandler gpsDataHandler;
+    private final GpsDataHandler gpsDataHandler;
     private LoginServer loginServer;
-    private SensorDataHandler sensorDataHandler;
+    private final SensorDataHandler sensorDataHandler;
     private final Janitor janitor;
+    private final ClientSensors sensors;
 
 
     public Server()
     {
         this.gpsDataHandler = new GpsDataHandler();
         this.sensorDataHandler = new SensorDataHandler();
+        this.sensors = new ClientSensors(this.sensorDataHandler);
         this.janitor = new Janitor(gpsDataHandler, sensorDataHandler, 3, 2);
 
     }
@@ -38,7 +41,7 @@ public class Server
     {
         try
         {
-            (new Thread(this.loginServer = new LoginServer(9058, gpsDataHandler))).start();
+            (new Thread(this.loginServer = new LoginServer(9058, gpsDataHandler, sensorDataHandler))).start();
             janitor.startCleanupThread();
             System.out.println("Type 'quit', 'shutdown' or 'exit' to initiate shutdown");
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));

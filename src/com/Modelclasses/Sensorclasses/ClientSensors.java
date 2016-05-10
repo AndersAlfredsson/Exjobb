@@ -15,20 +15,19 @@ import java.util.concurrent.Executors;
  */
 public class ClientSensors
 {
-    private ArrayList<SensorClient> clients;
     private ArrayList<String> IpList;
     private SensorDataHandler handler;
     private final ExecutorService pool;
 
     public ClientSensors(SensorDataHandler handler)
     {
-        this.clients = new ArrayList<>();
         this.IpList = new ArrayList<>();
         this.handler = handler;
         this.pool = Executors.newCachedThreadPool();
         if(readIpsFromFile("src/com/Modelclasses/Sensorclasses/SensorIps.txt"))
         {
-
+            System.out.println("Read clients");
+            createClients();
         }
         else
         {
@@ -37,30 +36,20 @@ public class ClientSensors
     }
     private void createClients()
     {
-        for(String ip: IpList)
+        for(String ip : IpList)
         {
-            System.out.println(IpList.size());
-            try {
-                Thread.sleep(100);
-            }
-            catch (InterruptedException e)
-            {
-                e.printStackTrace();
-            }
-            SensorClient client;
-            pool.execute(client = new SensorClient(this.handler, ip));
+            pool.execute(new SensorClient(this.handler, ip));
         }
     }
     private boolean readIpsFromFile(String PATH)
     {
-        ArrayList<String> dataList = new ArrayList<>();
         try
         {
             BufferedReader br = new BufferedReader(new FileReader(PATH));
             String line = br.readLine();
             while(line != null)
             {
-                dataList.add(line);
+                IpList.add(line);
                 line = br.readLine();
             }
             br.close();

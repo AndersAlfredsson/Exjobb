@@ -135,7 +135,7 @@ public class GpsDataHandler
         {
             HashMap.Entry pair = (HashMap.Entry)it.next();
             GpsDataContainer container = (GpsDataContainer) pair.getValue();
-            if(container.getMessage().getUsername() != email)
+            if(!container.getMessage().getUsername().equals(email))
             {
                 GpsCoordinates gpsData = new GpsCoordinates(container.getMessage().getLatitude(), container.getMessage().getLongitude());
                 data.add(gpsData);

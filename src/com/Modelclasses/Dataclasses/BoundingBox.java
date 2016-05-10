@@ -32,13 +32,9 @@ public class BoundingBox
      */
     public boolean isInsideBox(GPSCoordMessage coords)
     {
-        if(coords.getLongitude() > northWest.getLongitude() &&
+        return (coords.getLongitude() > northWest.getLongitude() &&
                 coords.getLatitude() < northWest.getLatitude() &&
                 coords.getLongitude() < southEast.getLongitude() &&
-                coords.getLatitude() > southEast.getLatitude())
-        {
-            return true;
-        }
-        return false;
+                coords.getLatitude() > southEast.getLatitude());
     }
 }

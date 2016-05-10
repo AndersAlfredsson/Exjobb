@@ -6,6 +6,7 @@ import com.DBcommunication.DBhandlerSingleton;
 import com.Enums.LogEvents;
 import com.Modelclasses.ApplicationUser;
 import com.Modelclasses.Dataclasses.GpsDataHandler;
+import com.Modelclasses.Dataclasses.SensorDataHandler;
 import com.Modelclasses.PasswordSecurity;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -27,7 +29,8 @@ public class UserHandler implements Runnable, Serializable
     private final ObjectOutputStream OUT;
     private boolean connected;
     private boolean authenticated;
-    private GpsDataHandler handler;
+    private final GpsDataHandler handler;
+    private final SensorDataHandler sensorDataHandler;
 
     /**
      * Constructor that sets up the connection and the I/O-ObjectStreams
@@ -35,7 +38,7 @@ public class UserHandler implements Runnable, Serializable
      * @param handler
      * @throws IOException
      */
-    public UserHandler(Socket socket, GpsDataHandler handler) throws IOException
+    public UserHandler(Socket socket, GpsDataHandler handler, SensorDataHandler sensorDataHandler) throws IOException
     {
         this.SOCKET = socket;
         this.IN = new ObjectInputStream(socket.getInputStream());
@@ -43,6 +46,7 @@ public class UserHandler implements Runnable, Serializable
         this.connected = false;
         this.authenticated = false;
         this.handler = handler;
+        this.sensorDataHandler = sensorDataHandler;
     }
 
     //region Setters & Getters
@@ -175,18 +179,17 @@ public class UserHandler implements Runnable, Serializable
         }
         else if(message instanceof RequestMessage)
         {
-            //System.out.println("RequestMessage");
             GPSCoordMessage gpsCoords = ((RequestMessage) message).getGpsCoords();
             handler.putData(gpsCoords);
-            //handler.printMap();
+            handler.printMap();
 
             if(handler.getOUTER_BOX().isInsideBox(gpsCoords))
             {
-                Random rng = new Random();
-                int i = rng.nextInt((10 - 1) + 1 ) + 1;
-                System.out.println("int: " + i);
                 ArrayList<GpsCoordinates> data = handler.getGpsData(((RequestMessage) message).getGpsCoords().getUsername());
-                sendMessage(new ServerMessage(ServerMessageType.SensorData, data, i));
+                HashMap<Integer, Section> sectionData = sensorDataHandler.getSensorSections();
+                sendMessage(new ServerMessage(ServerMessageType.SensorData, data, sectionData));
+                System.out.println("Sent message with amount: " + sectionData.get(0).getAmount());
+                System.out.println("Sent message with amount: " + sectionData.get(1).getAmount());
             }
             else
             {

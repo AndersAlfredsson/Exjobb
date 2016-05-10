@@ -1,11 +1,15 @@
 package com.Modelclasses.Dataclasses;
 
+import NetworkMessages.GpsCoordinates;
+import NetworkMessages.Section;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.atomic.DoubleAccumulator;
 
 /**
  * Created by Gustav on 2016-05-02.
@@ -19,26 +23,55 @@ public class SensorDataHandler
     public SensorDataHandler()
     {
         this.sensorPairs = new ArrayList<>();
+        this.sensorSections = new HashMap<>();
         this.expectedValues = new ArrayList<>();
-        ArrayList<String> dataList = readPairsFromFile("com/Modelclasses/Sensorclasses/SensorPairs.txt");
+        ArrayList<String> dataList = readDataFromFile("src/com/Modelclasses/Sensorclasses/SensorPairs.txt");
+        ArrayList<String> sectionDataList = readDataFromFile("src/com/Modelclasses/Sensorclasses/SectionGpsCoordinates.txt");
         convertToPairs(dataList);
+        convertSectionToCoordinates(sectionDataList);
     }
 
-
+    private void convertSectionToCoordinates(ArrayList<String> sectionDataList)
+    {
+        for(String coord : sectionDataList)
+        {
+            String[] temp = coord.split(",");
+            int id = Integer.parseInt(temp[0]);
+            double latitude = Double.parseDouble(temp[1]);
+            double longitude = Double.parseDouble(temp[2]);
+            GpsCoordinates coordinate = new GpsCoordinates(latitude, longitude);
+            Section s = sensorSections.get(id);
+            s.addCoorinates(coordinate);
+        }
+    }
     public synchronized void newValue(int id)
     {
         SensorPair pair = getPair(id);
-
         int expected = pair.getOtherSensor(id);
         if(isInExpectedList(expected))
         {
+            //System.out.println("Found expected value!");
             pair.sensorPairTriggered(expected);
         }
-        this.expectedValues.add(new ExpectedValue(id));
+        else
+        {
+            //System.out.println("Added new Expected value!");
+            this.expectedValues.add(new ExpectedValue(id));
+        }
+        //printPairs();
+    }
+
+    public void printPairs()
+    {
+        /*for(SensorPair p : this.sensorPairs)
+        {
+            System.out.println(p.toString());
+        }*/
+        System.out.println(getPair(6).toString());
     }
 
     /**
-     * gets a pair
+     * Gets a pair with matching id
      * @param id
      * @return
      */
@@ -55,19 +88,25 @@ public class SensorDataHandler
     }
 
     /**
-     * checks if a value is in the list of expected values
+     * Checks if a value is in the list of expected values
      * @param expectedId
      * @return
      */
     private boolean isInExpectedList(int expectedId)
     {
+        long timeNow = System.currentTimeMillis();
         for(ExpectedValue value : this.expectedValues)
         {
+            if((timeNow-value.getTimeAdded()) > 5000)
+            {
+                value.setRemove(true);
+            }
             if(expectedId == value.getSensorValue() && !value.isRemove())
             {
                 value.setRemove(true);
                 return true;
             }
+
         }
         return false;
     }
@@ -86,7 +125,7 @@ public class SensorDataHandler
      * @param PATH
      * @return
      */
-    private ArrayList<String> readPairsFromFile(final String PATH)
+    private ArrayList<String> readDataFromFile(final String PATH)
     {
         ArrayList<String> dataList = new ArrayList<>();
         try
@@ -126,14 +165,21 @@ public class SensorDataHandler
             pair.setInnerSensor(Integer.parseInt(temp[0]));
             pair.setOuterSensor(Integer.parseInt(temp[1]));
             int sectionId = Integer.parseInt(temp[2]);
-            if(!this.sensorSections.containsKey(sectionId))
+            if(!this.sensorSections.containsKey(sectionId) && sectionId != -1)
             {
                 section = new Section(sectionId);
                 this.sensorSections.put(section.getId(), section);
             }
             else
             {
-                section = this.sensorSections.get(sectionId);
+                if(sectionId != -1)
+                {
+                    section = this.sensorSections.get(sectionId);
+                }
+                else
+                {
+                    section = null;
+                }
             }
             pair.setInnerSection(section);
 
@@ -159,6 +205,11 @@ public class SensorDataHandler
         }
     }
 
+    public synchronized HashMap<Integer, Section> getSensorSections()
+    {
+        return this.sensorSections;
+    }
+
     /**
      * The method that runs on Janitor to remove old data
      */
@@ -169,7 +220,6 @@ public class SensorDataHandler
         ArrayList<ExpectedValue> temp = new ArrayList<>(this.expectedValues);
         for(ExpectedValue value : temp)
         {
-            System.out.println((currentTime-value.getTimeAdded()));
             if((currentTime-value.getTimeAdded()) >= 5000 || value.isRemove())
             {
                 this.expectedValues.remove(value);
@@ -194,11 +244,11 @@ public class SensorDataHandler
             this.remove = false;
         }
 
-        public boolean isRemove() {
+        public synchronized boolean isRemove() {
             return remove;
         }
 
-        public void setRemove(boolean remove) {
+        public synchronized void setRemove(boolean remove) {
             this.remove = remove;
         }
 
