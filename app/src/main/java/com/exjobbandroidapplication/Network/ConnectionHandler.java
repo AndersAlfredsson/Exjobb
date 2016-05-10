@@ -24,7 +24,7 @@ public class ConnectionHandler {
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
     private boolean connected = false;
-    private final String IPADRESS = "10.22.16.68";
+    private final String IPADRESS = "10.22.7.35";
     private final int PORTNR = 9058;
     private String eMail;
     private ServerMessage receivedMessage = null;

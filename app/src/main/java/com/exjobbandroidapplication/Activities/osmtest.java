@@ -108,14 +108,6 @@ public class osmtest extends AppCompatActivity {
         };
 
         gpsMyLocationProvider.startLocationProvider(iMyLocationConsumer);
-
-        //Disable scrolling on the map.
-        map.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return true;
-            }
-        });
     }
 
     private void linkClicked() {
@@ -127,11 +119,33 @@ public class osmtest extends AppCompatActivity {
      */
     private void setupMapView() {
         map = (MapView) findViewById(R.id.map);
+        map.setBuiltInZoomControls(true);
+        map.setMultiTouchControls(true);
         map.setTileSource(TileSourceFactory.MAPNIK);
-        IMapController mapController = map.getController();
-        GeoPoint centerGeoPoint = new GeoPoint(59.2542299, 15.2476963);
+        final IMapController mapController = map.getController();
+        final GeoPoint centerGeoPoint = new GeoPoint(59.2542299, 15.2476963);
         mapController.setCenter(centerGeoPoint);
+        map.setMinZoomLevel(17);
+        map.setMaxZoomLevel(18);
         mapController.setZoom(18);
+
+        //Disable scrolling on the map.
+        map.setOnTouchListener(new View.OnTouchListener() {
+       @Override
+       public boolean onTouch(View v, MotionEvent event) {
+           if(event.getAction() ==  MotionEvent.ACTION_UP) {
+               mapController.setCenter(centerGeoPoint);
+               return true;
+           }
+           if(event.getPointerCount() > 1) {
+               mapController.setCenter(centerGeoPoint);
+               return false;
+           }
+           else {
+               return true;
+           }
+       }
+   });
     }
 
     /**
@@ -274,4 +288,3 @@ public class osmtest extends AppCompatActivity {
         }
     }
 }
-//TODO : Fixa så att det ser bra ut på telefoner med lägre upplösning.

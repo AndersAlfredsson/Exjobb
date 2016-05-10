@@ -6,6 +6,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -26,7 +27,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,9 +36,6 @@ import android.widget.Toast;
 import com.exjobbandroidapplication.Network.ConnectionHandler;
 import com.exjobbandroidapplication.R;
 import com.exjobbandroidapplication.Resources.inputCheck;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import Enums.ServerMessageType;
 import NetworkMessages.LoginMessage;
@@ -77,12 +74,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
+        mEmailView.setText(this.getPreferences(Context.MODE_PRIVATE).getString("email", null));
 
         //Check if the user has given permissions.
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, 0);
         }
-        //TODO : Sätt zoomlevel på kartan beroende på användarens upplösning??
 
         mPasswordView = (EditText) findViewById(R.id.password);
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -249,6 +246,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
+            saveEmail();
             mAuthTask = new UserLoginTask(email, password1);
             mAuthTask.execute((Void) null);
         }
@@ -266,8 +264,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            mLoginFormView.animate().setDuration(shortAnimTime).alpha(show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
                     mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
@@ -303,17 +300,25 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-
+    private void saveEmail() {
+        SharedPreferences.Editor editor = getPreferences(Context.MODE_PRIVATE).edit();
+        editor.putString("email", mEmailView.getText().toString());
+        if (editor.commit()) {
+            Log.d("saveEmail", "Saved email");
+        }
+        else {
+            Log.d("saveEmail", "Saved email failed");
+        }
     }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {}
 
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
         private final String mEmail;
         private final String mPassword;
 
