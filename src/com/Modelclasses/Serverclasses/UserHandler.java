@@ -187,13 +187,14 @@ public class UserHandler implements Runnable, Serializable
             {
                 ArrayList<GpsCoordinates> data = handler.getGpsData(((RequestMessage) message).getGpsCoords().getUsername());
                 HashMap<Integer, Section> sectionData = sensorDataHandler.getSensorSections();
-                sendMessage(new ServerMessage(ServerMessageType.SensorData, data, sectionData));
-                System.out.println("Sent message with amount: " + sectionData.get(0).getAmount());
-                System.out.println("Sent message with amount: " + sectionData.get(1).getAmount());
+                SensorDataMessage sdm = new SensorDataMessage(data, sectionData);
+                System.out.println(sdm.getSectionMap().get(0).getAmount());
+                System.out.println(sdm.getSectionMap().get(1).getAmount());
+                sendMessage(new ServerMessage(ServerMessageType.SensorData, sdm));
             }
             else
             {
-                sendMessage(new ServerMessage(ServerMessageType.SensorData,(Object)null, (Object) null));
+                sendMessage(new ServerMessage(ServerMessageType.SensorData, null));
             }
         }
     }
@@ -209,6 +210,7 @@ public class UserHandler implements Runnable, Serializable
             try
             {
                 this.OUT.writeObject(message);
+                this.OUT.reset();
             }
             catch (IOException e)
             {
@@ -250,10 +252,10 @@ public class UserHandler implements Runnable, Serializable
         {
             PasswordSecurity.hashPassword(user);
             DBhandlerSingleton.getInstance().insertUser(user);
-            System.out.println("Register Complete");
+            //System.out.println("Register Complete");
             return true;
         }
-        System.out.println("Register not possible");
+        //System.out.println("Register not possible");
         return false;
     }
 
@@ -268,24 +270,22 @@ public class UserHandler implements Runnable, Serializable
         ApplicationUser dbUser = DBhandlerSingleton.getInstance().getUser(user.getEmail());
         if(dbUser != null)
         {
-            boolean test = PasswordSecurity.authenticate(user, dbUser);
-            System.out.println(test);
-            if(test)
+            if(PasswordSecurity.authenticate(user, dbUser))
             {
-                System.out.println("Login Successful");
+                //System.out.println("Login Successful");
                 DBhandlerSingleton.getInstance().log(LogEvents.SuccessfulLoginAttempt, user);
                 return true;
             }
             else
             {
-                System.out.println("Login unsuccessful");
+                //System.out.println("Login unsuccessful");
                 DBhandlerSingleton.getInstance().log(LogEvents.UnsuccessfulLoginAttempt, user);
                 return false;
             }
         }
         else
         {
-            System.out.println("Login unsuccessful");
+            //System.out.println("Login unsuccessful");
             DBhandlerSingleton.getInstance().log(LogEvents.UnsuccessfulLoginAttempt, user);
             return false;
         }
