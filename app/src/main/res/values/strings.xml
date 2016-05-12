@@ -21,6 +21,7 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="Register">Register</string>
     <string name="prompt_password_notoptional">Password</string>
+    <string name="prompt_repeat_password_notoptional">Repeat Password</string>
 
     <string name="title_activity_campus_map">CampusMapActivity</string>
 

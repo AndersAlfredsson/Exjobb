@@ -13,6 +13,7 @@ import java.net.SocketAddress;
 import Enums.ServerMessageType;
 import NetworkMessages.DisconnectMessage;
 import NetworkMessages.Message;
+import NetworkMessages.SensorDataMessage;
 import NetworkMessages.ServerMessage;
 
 /**
@@ -23,12 +24,9 @@ public class ConnectionHandler {
     private Socket socket = null;
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
-    private boolean connected = false;
-    private final String IPADRESS = "10.22.7.35";
+    private final String IPADRESS = "10.22.7.224";
     private final int PORTNR = 9058;
     private String eMail;
-    private ServerMessage receivedMessage = null;
-
 
     public static ConnectionHandler getInstance() {
         if (ourInstance == null){
@@ -40,7 +38,6 @@ public class ConnectionHandler {
     private ConnectionHandler() {
 
     }
-
 
     /**
      * Closes all streams.
@@ -93,11 +90,25 @@ public class ConnectionHandler {
      * @param message Message to be sent to server.
      * @return whether sending the message is successful or not.
      */
-    public ServerMessage sendMessage(Message message) {
+    public synchronized ServerMessage sendMessage(Message message) {
         try {
             out.writeObject(message);
             try {
                 ServerMessage serverMessage = (ServerMessage) in.readObject();
+
+                if (serverMessage == null) {
+                    return null;
+                }
+
+                if (serverMessage.getMessageType() == ServerMessageType.SensorData) {
+                    SensorDataMessage sensorDataMessage = (SensorDataMessage) serverMessage.getMessage();
+                    ServerMessage serverMessage1 = new ServerMessage(ServerMessageType.SensorData ,sensorDataMessage);
+                    Log.d("Server message = ", String.valueOf(serverMessage));
+                    SensorDataMessage s = (SensorDataMessage)serverMessage1.getMessage();
+                    int i = s.getSectionMap().get(0).getAmount();
+                    Log.d("Amount = ",  Integer.toString(i));
+                }
+
                 if (serverMessage != null) {
                     return serverMessage;
                 }
