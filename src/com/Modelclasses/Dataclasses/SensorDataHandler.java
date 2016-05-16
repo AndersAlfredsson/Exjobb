@@ -1,8 +1,10 @@
 package com.Modelclasses.Dataclasses;
 
-import NetworkMessages.GpsCoordinates;
 import NetworkMessages.Section;
+import com.Enums.XmlParseType;
+import com.Modelclasses.Sensorclasses.XmlFileReader;
 
+import javax.xml.bind.JAXBException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -21,28 +23,23 @@ public class SensorDataHandler
 
     public SensorDataHandler()
     {
+        XmlFileReader reader = new XmlFileReader();
         this.sensorPairs = new ArrayList<>();
         this.sensorSections = new HashMap<>();
         this.expectedValues = new ArrayList<>();
-        ArrayList<String> dataList = readDataFromFile("src/com/Modelclasses/Sensorclasses/SensorPairs.txt");
-        ArrayList<String> sectionDataList = readDataFromFile("src/com/Modelclasses/Sensorclasses/SectionGpsCoordinates.txt");
-        convertToPairs(dataList);
-        convertSectionToCoordinates(sectionDataList);
-    }
-
-    private void convertSectionToCoordinates(ArrayList<String> sectionDataList)
-    {
-        for(String coord : sectionDataList)
+        try
         {
-            String[] temp = coord.split(",");
-            int id = Integer.parseInt(temp[0]);
-            double latitude = Double.parseDouble(temp[1]);
-            double longitude = Double.parseDouble(temp[2]);
-            GpsCoordinates coordinate = new GpsCoordinates(latitude, longitude);
-            Section s = sensorSections.get(id);
-            s.addCoorinates(coordinate);
+            this.sensorPairs = reader.readFile("src/com/Modelclasses/Sensorclasses/SensorPairs.xml", XmlParseType.SensorPair);
+            convertToPairs();
+            ArrayList<Section> sectionData = reader.readFile("src/com/Modelclasses/Sensorclasses/SectionGpsCoordinates.xml", XmlParseType.SectionGPS);
+            AddSectionsToMap(sectionData);
+        }
+        catch (JAXBException e)
+        {
+            e.printStackTrace();
         }
     }
+
     public synchronized void newValue(int id)
     {
         SensorPair pair = getPair(id);
@@ -150,29 +147,23 @@ public class SensorDataHandler
 
     /**
      * Converts a list of strings to pairs and sections
-     * @param dataList
      */
-    private void convertToPairs(ArrayList<String> dataList)
+    private synchronized void convertToPairs()
     {
-        for(String s:dataList)
+        for(SensorPair pair : this.sensorPairs)
         {
-            SensorPair pair = new SensorPair();
-            String[] temp = s.split(",");
             Section section;
-
-            pair.setInnerSensor(Integer.parseInt(temp[0]));
-            pair.setOuterSensor(Integer.parseInt(temp[1]));
-            int sectionId = Integer.parseInt(temp[2]);
-            if(!this.sensorSections.containsKey(sectionId) && sectionId != -1)
+            int innerSectionID = pair.getInnerSectionID();
+            if(!this.sensorSections.containsKey(innerSectionID) && innerSectionID != -1)
             {
-                section = new Section(sectionId);
+                section = new Section(innerSectionID);
                 this.sensorSections.put(section.getId(), section);
             }
             else
             {
-                if(sectionId != -1)
+                if(innerSectionID != -1)
                 {
-                    section = this.sensorSections.get(sectionId);
+                    section = this.sensorSections.get(innerSectionID);
                 }
                 else
                 {
@@ -181,17 +172,18 @@ public class SensorDataHandler
             }
             pair.setInnerSection(section);
 
-            sectionId = Integer.parseInt(temp[3]);
-            if(!this.sensorSections.containsKey(sectionId) && sectionId != -1)
+
+            int outerSectionId = pair.getOuterSectionID();
+            if(!this.sensorSections.containsKey(outerSectionId) && outerSectionId != -1)
             {
-                section = new Section(sectionId);
+                section = new Section(outerSectionId);
                 this.sensorSections.put(section.getId(), section);
             }
             else
             {
-                if(sectionId != -1)
+                if(outerSectionId != -1)
                 {
-                    section = this.sensorSections.get(sectionId);
+                    section = this.sensorSections.get(outerSectionId);
                 }
                 else
                 {
@@ -199,7 +191,18 @@ public class SensorDataHandler
                 }
             }
             pair.setNeighboringSection(section);
-            this.sensorPairs.add(pair);
+        }
+    }
+
+    /**
+     * Converts read data to coordinates
+     * @param sectionDataList
+     */
+    private void AddSectionsToMap(ArrayList<Section> sectionDataList)
+    {
+        for(Section s : sectionDataList)
+        {
+            this.sensorSections.put(s.getId(), s);
         }
     }
 

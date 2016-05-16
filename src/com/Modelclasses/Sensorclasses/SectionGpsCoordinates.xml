@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Sections>
+    <Section>
+        <ID>0</ID>
+        <Coordinates>
+            <Coordinate>
+                <Latitude>59.254466</Latitude>
+                <Longitude>15.246934</Longitude>
+            </Coordinate>
+            <Coordinate>
+                <Latitude>59.254466</Latitude>
+                <Longitude>15.245775</Longitude>
+            </Coordinate>
+            <Coordinate>
+                <Latitude>59.254115</Latitude>
+                <Longitude>15.245775</Longitude>
+            </Coordinate>
+            <Coordinate>
+                <Latitude>59.254115</Latitude>
+                <Longitude>15.246934</Longitude>
+            </Coordinate>
+        </Coordinates>
+    </Section>
+    <Section>
+        <ID>1</ID>
+        <Coordinates>
+            <Coordinate>
+                <Latitude>59.254554</Latitude>
+                <Longitude>15.248028</Longitude>
+            </Coordinate>
+            <Coordinate>
+                <Latitude>59.254543</Latitude>
+                <Longitude>15.246961</Longitude>
+            </Coordinate>
+            <Coordinate>
+                <Latitude>59.254208</Latitude>
+                <Longitude>15.246929</Longitude>
+            </Coordinate>
+            <Coordinate>
+                <Latitude>59.254213</Latitude>
+                <Longitude>15.248039</Longitude>
+            </Coordinate>
+        </Coordinates>
+    </Section>
+</Sections>
