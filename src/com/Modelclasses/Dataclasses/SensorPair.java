@@ -2,6 +2,7 @@ package com.Modelclasses.Dataclasses;
 
 
 import NetworkMessages.Section;
+import com.DBcommunication.DBhandlerSingleton;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -108,9 +109,10 @@ public class SensorPair
      */
     public synchronized void sensorPairTriggered(int expected)
     {
-        if(expected == innerSensor)
-        {
+        if(expected == innerSensor) {
             innerSection.increment();
+            //Log event to database.
+            DBhandlerSingleton.getInstance().logSensorEvent(innerSensor,outerSensor);
             if(neighboringSection != null && neighboringSection.getAmount() > 0)
             {
                 neighboringSection.decrement();
@@ -118,6 +120,8 @@ public class SensorPair
         }
         else
         {
+            //Log event to database.
+            DBhandlerSingleton.getInstance().logSensorEvent(outerSensor, innerSensor);
             if(innerSection.getAmount() > 0)
             {
                 innerSection.decrement();

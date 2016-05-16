@@ -9,6 +9,7 @@ import java.io.Serializable;
 public class ApplicationUser implements Serializable
 {
     private int ID;
+    private int anonymousID;
     private String email;
     private String password;
     private String salt;
@@ -69,5 +70,13 @@ public class ApplicationUser implements Serializable
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public int getAnonymousID() {
+        return anonymousID;
+    }
+
+    public void setAnonymousID(int anonymousID) {
+        this.anonymousID = anonymousID;
     }
 }

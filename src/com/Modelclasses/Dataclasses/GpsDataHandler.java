@@ -2,6 +2,8 @@ package com.Modelclasses.Dataclasses;
 
 import NetworkMessages.GPSCoordMessage;
 import NetworkMessages.GpsCoordinates;
+import com.DBcommunication.DBhandlerSingleton;
+
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +17,9 @@ public class GpsDataHandler
 {
     private HashMap<String, GpsDataContainer> dataMap;
     private int messagesReceived;
+    private final int logMinimumDelay = 8000;
+    private long currentTime;
+    private long previousTime;
     private final BoundingBox INNER_BOX = new BoundingBox(59.25545, 15.243498, 59.253333, 15.252124);
     private final BoundingBox OUTER_BOX = new BoundingBox(59.256789, 15.240086, 59.251622, 15.256308);
 
@@ -32,11 +37,12 @@ public class GpsDataHandler
      * if it is, it removes the object first and then adds the new one.
      * @param message Information about gpsCoordinates
      */
-    public synchronized void putData(GPSCoordMessage message)
+    public synchronized void putData(GPSCoordMessage message, int anonymousID)
     {
         GpsDataContainer container = new GpsDataContainer(message, ZonedDateTime.now());
         if(this.INNER_BOX.isInsideBox(message))
         {
+            logGPS(message, anonymousID);
             if(dataMap.containsKey(message.getUsername()))
             {
                 //System.out.println("Replaced data in map");
@@ -110,6 +116,15 @@ public class GpsDataHandler
             }
         }
         System.out.println("GpsData Cleanup done with " + amountRemoved + " removed");
+    }
+
+    private void logGPS(GPSCoordMessage message, int anonymousID) {
+        currentTime = System.currentTimeMillis();
+        if (currentTime >= (previousTime + logMinimumDelay)) {
+            DBhandlerSingleton.getInstance().logGPS(anonymousID, message.getLatitude(),message.getLongitude());
+            previousTime = currentTime;
+        }
+
     }
 
     //region Getters & Setters

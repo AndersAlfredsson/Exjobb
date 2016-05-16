@@ -159,6 +159,18 @@ public class DBhandlerSingleton {
         }
     }
 
+    public synchronized void logGPS(int anonymousID, double latitude, double longitude){
+        if (checkConnection()){
+            logger.logGPS(anonymousID, latitude, longitude);
+        }
+    }
+
+    public synchronized void logSensorEvent(int firstSensor, int secondSensor){
+        if (checkConnection()){
+            logger.logSensorEvent(firstSensor, secondSensor);
+        }
+    }
+
     //Getters and Setters.
     public Connection getConnection() {
         return connection;

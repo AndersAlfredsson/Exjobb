@@ -5,10 +5,10 @@ package com.Enums;
  * Enum for the different Logging events.
  */
 public enum LogEvents {
-        Login,
-        Delete,
-        SuccessfulLoginAttempt,
-        UnsuccessfulLoginAttempt,
-        Insert,
-        Disconnect
+    Login,
+    Delete,
+    SuccessfulLoginAttempt,
+    UnsuccessfulLoginAttempt,
+    Insert,
+    Disconnect
 }
