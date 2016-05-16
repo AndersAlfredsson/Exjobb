@@ -31,6 +31,8 @@ public class UserHandler implements Runnable, Serializable
     private boolean authenticated;
     private final GpsDataHandler handler;
     private final SensorDataHandler sensorDataHandler;
+    private static ArrayList<Integer> usedIDs = new ArrayList<>();
+    private int anonymousID;
 
     /**
      * Constructor that sets up the connection and the I/O-ObjectStreams
@@ -47,6 +49,7 @@ public class UserHandler implements Runnable, Serializable
         this.authenticated = false;
         this.handler = handler;
         this.sensorDataHandler = sensorDataHandler;
+        anonymousID = -1;
     }
 
     //region Setters & Getters
@@ -118,6 +121,7 @@ public class UserHandler implements Runnable, Serializable
                 try
                 {
                     System.err.println("Client closed connection without disconnect...");
+
                     this.SOCKET.close();
                 }
                 catch (IOException e1)
@@ -130,6 +134,9 @@ public class UserHandler implements Runnable, Serializable
             {
                 e.printStackTrace();
             }
+        }
+        if (anonymousID != -1) {
+            usedIDs.remove(anonymousID);
         }
     }
 
@@ -169,6 +176,7 @@ public class UserHandler implements Runnable, Serializable
             else
             {
                 sendMessage(new ServerMessage(ServerMessageType.Authenticated, "Register & Login Successful"));
+                giveAnonymousID();
             }
         }
         else if(message instanceof DisconnectMessage)
@@ -180,7 +188,7 @@ public class UserHandler implements Runnable, Serializable
         else if(message instanceof RequestMessage)
         {
             GPSCoordMessage gpsCoords = ((RequestMessage) message).getGpsCoords();
-            handler.putData(gpsCoords);
+            handler.putData(gpsCoords, anonymousID);
             handler.printMap();
 
             if(handler.getOUTER_BOX().isInsideBox(gpsCoords))
@@ -274,6 +282,7 @@ public class UserHandler implements Runnable, Serializable
             {
                 //System.out.println("Login Successful");
                 DBhandlerSingleton.getInstance().log(LogEvents.SuccessfulLoginAttempt, user);
+                giveAnonymousID();
                 return true;
             }
             else
@@ -290,5 +299,17 @@ public class UserHandler implements Runnable, Serializable
             return false;
         }
 
+    }
+
+    /**
+     * Give a user an anonymous id to separate logged in users in the gpslog in the database.
+     */
+    private void giveAnonymousID() {
+        int id = 0;
+        while(usedIDs.contains(id))
+        {
+            id++;
+        }
+        anonymousID = id;
     }
 }
