@@ -4,14 +4,26 @@ package com.Modelclasses.Dataclasses;
 import NetworkMessages.Section;
 import com.DBcommunication.DBhandlerSingleton;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * Created by Gustav on 2016-05-09.
  */
-
+@XmlRootElement(name = "SensorPair")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class SensorPair
 {
+    @XmlElement(name = "innerSensor")
     private int innerSensor;
+    @XmlElement(name = "outerSensor")
     private int outerSensor;
+    @XmlElement(name = "innerSectionID")
+    private int innerSectionID;
+    @XmlElement(name = "outerSectionID")
+    private int outerSectionID;
     private Section innerSection;
     private Section neighboringSection;
 
@@ -19,12 +31,16 @@ public class SensorPair
     {
         this.innerSensor = -1;
         this.outerSensor = -1;
+        this.innerSectionID = -1;
+        this.outerSectionID = -1;
     }
 
-    public SensorPair(int i, int j)
+    public SensorPair(int innerSensor, int outerSensor, int innerSectionID, int outerSectionID)
     {
-        this.innerSensor = i;
-        this.outerSensor = j;
+        this.innerSensor = innerSensor;
+        this.outerSensor = outerSensor;
+        this.innerSectionID = innerSectionID;
+        this.outerSectionID = outerSectionID;
     }
 
     public int getInnerSensor() {
@@ -49,6 +65,22 @@ public class SensorPair
 
     public void setNeighboringSection(Section neighboringSection) {
         this.neighboringSection = neighboringSection;
+    }
+
+    public int getOuterSectionID() {
+        return outerSectionID;
+    }
+
+    public void setOuterSectionID(int outerSectionID) {
+        this.outerSectionID = outerSectionID;
+    }
+
+    public int getInnerSectionID() {
+        return innerSectionID;
+    }
+
+    public void setInnerSectionID(int innerSectionID) {
+        this.innerSectionID = innerSectionID;
     }
 
     public int getOtherSensor(int id)
@@ -89,7 +121,7 @@ public class SensorPair
         }
     }
 
-    @Override
+    /*@Override
     public String toString()
     {
         if(this.neighboringSection == null)
@@ -101,5 +133,5 @@ public class SensorPair
             return this.innerSensor + " - " + this.outerSensor + ", " + this.innerSection.toString() + ", " + this.neighboringSection.toString();
         }
 
-    }
+    }*/
 }
