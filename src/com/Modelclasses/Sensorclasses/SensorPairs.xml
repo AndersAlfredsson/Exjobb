@@ -7,26 +7,14 @@
         <outerSectionID>-1</outerSectionID>
     </SensorPair>
     <SensorPair>
-        <innerSensor>3</innerSensor>
-        <outerSensor>2</outerSensor>
-        <innerSectionID>0</innerSectionID>
-        <outerSectionID>-1</outerSectionID>
-    </SensorPair>
-    <SensorPair>
-        <innerSensor>4</innerSensor>
-        <outerSensor>5</outerSensor>
-        <innerSectionID>0</innerSectionID>
-        <outerSectionID>-1</outerSectionID>
-    </SensorPair>
-    <SensorPair>
-        <innerSensor>6</innerSensor>
-        <outerSensor>7</outerSensor>
+        <innerSensor>2</innerSensor>
+        <outerSensor>3</outerSensor>
         <innerSectionID>0</innerSectionID>
         <outerSectionID>1</outerSectionID>
     </SensorPair>
     <SensorPair>
-        <innerSensor>8</innerSensor>
-        <outerSensor>9</outerSensor>
+        <innerSensor>4</innerSensor>
+        <outerSensor>5</outerSensor>
         <innerSectionID>1</innerSectionID>
         <outerSectionID>-1</outerSectionID>
     </SensorPair>

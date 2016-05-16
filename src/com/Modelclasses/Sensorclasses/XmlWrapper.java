@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 /**
  * Created by Gustav on 2016-05-16.
+ * Wrapper class, used in XmlFileReader
  */
 public class XmlWrapper<T>
 {

@@ -1,5 +1,6 @@
 package com.Modelclasses.Dataclasses;
 
+import NetworkMessages.GpsCoordinates;
 import NetworkMessages.Section;
 import com.Enums.XmlParseType;
 import com.Modelclasses.Sensorclasses.XmlFileReader;
@@ -40,6 +41,10 @@ public class SensorDataHandler
         }
     }
 
+    /**
+     * When a new value comes from the sensor, this checks if server is expecting value, otherwise it adds it to expected
+     * @param id
+     */
     public synchronized void newValue(int id)
     {
         SensorPair pair = getPair(id);
@@ -55,14 +60,6 @@ public class SensorDataHandler
             this.expectedValues.add(new ExpectedValue(id));
         }
         //printPairs();
-    }
-
-    public void printPairs()
-    {
-        for(SensorPair p : this.sensorPairs)
-        {
-            System.out.println(p.toString());
-        }
     }
 
     /**
@@ -92,7 +89,7 @@ public class SensorDataHandler
         long timeNow = System.currentTimeMillis();
         for(ExpectedValue value : this.expectedValues)
         {
-            if((timeNow-value.getTimeAdded()) > 5000)
+            if((timeNow - value.getTimeAdded()) > 5000)
             {
                 value.setRemove(true);
             }
@@ -101,7 +98,6 @@ public class SensorDataHandler
                 value.setRemove(true);
                 return true;
             }
-
         }
         return false;
     }
@@ -202,7 +198,10 @@ public class SensorDataHandler
     {
         for(Section s : sectionDataList)
         {
-            this.sensorSections.put(s.getId(), s);
+            for(GpsCoordinates gps : s.getSectionGpsCoordinates())
+            {
+                this.sensorSections.get(s.getId()).addCoordinates(gps);
+            }
         }
     }
 
@@ -245,6 +244,7 @@ public class SensorDataHandler
             this.remove = false;
         }
 
+        //region Setters & Getters
         public synchronized boolean isRemove() {
             return remove;
         }
@@ -268,5 +268,6 @@ public class SensorDataHandler
         public void setSensorValue(int sensorValue) {
             this.sensorValue = sensorValue;
         }
+        //endregion
     }
 }

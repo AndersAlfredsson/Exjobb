@@ -49,6 +49,7 @@ public class Sensor implements Runnable
         try
         {
             this.OUT.writeInt(id);
+            //System.out.println(id + " sent " + id);
         }
         catch (IOException e)
         {
@@ -56,6 +57,7 @@ public class Sensor implements Runnable
         }
     }
 
+    @Override
     public String toString()
     {
         return this.ID1 + " - " + this.ID2;

@@ -66,7 +66,7 @@ public class Janitor
 
         Thread sensorCleanUpThread = new Thread(() ->
         {
-            //System.out.println("SensorCleanupThread started...");
+            System.out.println("SensorCleanupThread started...");
             while(this.runCleanup)
             {
                 try

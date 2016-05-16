@@ -4,20 +4,20 @@
         <ID>0</ID>
         <Coordinates>
             <Coordinate>
-                <Latitude>59.254466</Latitude>
-                <Longitude>15.246934</Longitude>
+                <Latitude>59.254562</Latitude>
+                <Longitude>15.248144</Longitude>
             </Coordinate>
             <Coordinate>
-                <Latitude>59.254466</Latitude>
-                <Longitude>15.245775</Longitude>
+                <Latitude>59.254559</Latitude>
+                <Longitude>15.247489</Longitude>
             </Coordinate>
             <Coordinate>
-                <Latitude>59.254115</Latitude>
-                <Longitude>15.245775</Longitude>
+                <Latitude>59.254208</Latitude>
+                <Longitude>15.247489</Longitude>
             </Coordinate>
             <Coordinate>
-                <Latitude>59.254115</Latitude>
-                <Longitude>15.246934</Longitude>
+                <Latitude>59.254211</Latitude>
+                <Longitude>15.24816</Longitude>
             </Coordinate>
         </Coordinates>
     </Section>
@@ -25,20 +25,20 @@
         <ID>1</ID>
         <Coordinates>
             <Coordinate>
-                <Latitude>59.254554</Latitude>
-                <Longitude>15.248028</Longitude>
+                <Latitude>59.254562</Latitude>
+                <Longitude>15.249404</Longitude>
             </Coordinate>
             <Coordinate>
-                <Latitude>59.254543</Latitude>
-                <Longitude>15.246961</Longitude>
+                <Latitude>59.254562</Latitude>
+                <Longitude>15.248144</Longitude>
             </Coordinate>
             <Coordinate>
-                <Latitude>59.254208</Latitude>
-                <Longitude>15.246929</Longitude>
+                <Latitude>59.254211</Latitude>
+                <Longitude>15.24816</Longitude>
             </Coordinate>
             <Coordinate>
-                <Latitude>59.254213</Latitude>
-                <Longitude>15.248039</Longitude>
+                <Latitude>59.254222</Latitude>
+                <Longitude>15.249404</Longitude>
             </Coordinate>
         </Coordinates>
     </Section>

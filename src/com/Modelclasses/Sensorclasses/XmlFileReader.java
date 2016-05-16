@@ -4,19 +4,16 @@ import NetworkMessages.GpsCoordinates;
 import NetworkMessages.Section;
 import com.Enums.XmlParseType;
 import com.Modelclasses.Dataclasses.SensorPair;
-import com.sun.jmx.remote.internal.Unmarshal;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
 import java.util.ArrayList;
 
 /**
  * Created by Gustav on 2016-05-16.
+ * Class that reads XML from file and converts it to an object
  */
 public class XmlFileReader
 {
@@ -25,6 +22,13 @@ public class XmlFileReader
 
     }
 
+    /**
+     * Reads the XML file from PATH
+     * @param PATH
+     * @param type
+     * @return
+     * @throws JAXBException
+     */
     public ArrayList readFile(final String PATH, XmlParseType type) throws  JAXBException
     {
         JAXBContext jaxbContext = JAXBContext.newInstance(XmlWrapper.class, SensorPair.class, Section.class, GpsCoordinates.class);
@@ -42,6 +46,13 @@ public class XmlFileReader
         return null;
     }
 
+    /**
+     * Reads and converts the XML-file
+     * @param unmarshaller
+     * @param xmlLocation
+     * @param <T>
+     * @return
+     */
     private <T> ArrayList<T> unmarshal(Unmarshaller unmarshaller, String xmlLocation)
     {
         StreamSource xml = new StreamSource(xmlLocation);

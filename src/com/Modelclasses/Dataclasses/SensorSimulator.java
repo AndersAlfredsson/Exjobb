@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Goustmachine on 2016-05-05.
+ * Simulation of sensor events
  */
 public class SensorSimulator
 {
@@ -22,6 +23,9 @@ public class SensorSimulator
         SensorSimulator s = new SensorSimulator();
     }
 
+    /**
+     * Listens for connections from server
+     */
     public SensorSimulator()
     {
         outMap = new HashMap<>();
@@ -49,6 +53,11 @@ public class SensorSimulator
         }).start();
 
     }
+
+    /**
+     * Shutdowns
+     * @param pool
+     */
     private void shutdownAndAwaitTermination(ExecutorService pool)
     {
         try
@@ -70,8 +79,4 @@ public class SensorSimulator
         }
     }
 
-    private void sendMessage(int id)
-    {
-        this.outMap.get(id).sendMessage(id);
-    }
 }

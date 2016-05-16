@@ -10,6 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Created by Gustav on 2016-05-09.
+ * Class that handles two sensors to create a pair
  */
 @XmlRootElement(name = "SensorPair")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -42,6 +43,7 @@ public class SensorPair
         this.outerSectionID = outerSectionID;
     }
 
+    //region Setters & Getters
     public int getInnerSensor() {
         return innerSensor;
     }
@@ -82,6 +84,11 @@ public class SensorPair
         this.innerSectionID = innerSectionID;
     }
 
+    /**
+     * Gets the other sensor from the one sent in
+     * @param id
+     * @return
+     */
     public int getOtherSensor(int id)
     {
         if(id == innerSensor)
@@ -93,7 +100,12 @@ public class SensorPair
             return innerSensor;
         }
     }
+    //endregion
 
+    /**
+     * If called, the function will handle increment/decrement of the appropriate sections for the event
+     * @param expected
+     */
     public synchronized void sensorPairTriggered(int expected)
     {
         if(expected == innerSensor)
