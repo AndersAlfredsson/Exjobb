@@ -80,12 +80,12 @@ public class Sensor implements Runnable
                     } else {
                         other = this.ID1;
                     }
-                    System.out.println("sending: " + whoSend + ", from " + this.toString());
+                    //System.out.println("sending: " + whoSend + ", from " + this.toString());
                     sendMessage(whoSend);
                     sleepTime = (ThreadLocalRandom.current().nextInt(1, 5 + 1)) * 1000;
                     Thread.sleep(sleepTime);
                     if (ThreadLocalRandom.current().nextInt(0, 100) < 95) {
-                        System.out.println("sending: " + other + ", from " + this.toString());
+                        //System.out.println("sending: " + other + ", from " + this.toString());
                         sendMessage(other);
                     }
                 }

@@ -9,7 +9,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.atomic.DoubleAccumulator;
 
 /**
  * Created by Gustav on 2016-05-02.
@@ -63,11 +62,10 @@ public class SensorDataHandler
 
     public void printPairs()
     {
-        /*for(SensorPair p : this.sensorPairs)
+        for(SensorPair p : this.sensorPairs)
         {
             System.out.println(p.toString());
-        }*/
-        System.out.println(getPair(6).toString());
+        }
     }
 
     /**

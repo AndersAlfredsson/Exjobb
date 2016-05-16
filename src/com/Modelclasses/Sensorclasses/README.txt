@@ -1,6 +1,6 @@
------------------------------------------------------------
-Documentation for creating and managing sensors and section
------------------------------------------------------------
+------------------------------------------------------------
+Documentation for creating and managing sensors and sections
+------------------------------------------------------------
 
 *- SensorIps.txt -*
 Just add one Ip-Address to each row for each sensor,
