@@ -24,7 +24,7 @@ public class ConnectionHandler {
     private Socket socket = null;
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
-    private final String IPADRESS = "10.22.7.224";
+    private final String IPADRESS = "10.22.13.244";
     private final int PORTNR = 9058;
     private String eMail;
 
@@ -77,13 +77,7 @@ public class ConnectionHandler {
     }
 
 
-    public void seteMail(String eMail) {
-        this.eMail = eMail;
-    }
 
-    public String geteMail() {
-        return eMail;
-    }
 
     /**
      * Sends a message to the server.
@@ -120,4 +114,14 @@ public class ConnectionHandler {
         }
         return null;
     }
+
+    //region Getters & Setters
+    public void seteMail(String eMail) {
+        this.eMail = eMail;
+    }
+
+    public String geteMail() {
+        return eMail;
+    }
+    //endregion
 }

@@ -128,7 +128,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     /**
-     *
+     * Checks if the user has given the application the required permissions.
      * @param context
      * @param permissions
      * @return
@@ -152,6 +152,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                            @NonNull int[] grantResults) {
     }
 
+    /**
+     * Run when the user presses the back button in the registration form.
+     */
     private void backPressed() {
         backButton.setVisibility(View.GONE);
         registrationMode = false;
@@ -160,6 +163,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         mPasswordRepeatView.setText("");
     }
 
+    /**
+     *
+     */
     private void registrationPressed() {
         if (registrationMode) {
             attemptLogin();

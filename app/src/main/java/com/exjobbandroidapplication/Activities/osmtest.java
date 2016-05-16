@@ -61,7 +61,10 @@ public class osmtest extends AppCompatActivity {
     private int screenWidth;
     private int textSize;
 
-
+    /**
+     * Is run when the activity is created.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,6 +117,10 @@ public class osmtest extends AppCompatActivity {
         gpsMyLocationProvider.startLocationProvider(iMyLocationConsumer);
     }
 
+    /**
+     * Calculate the size of the text displaying number of people in a section. Calculation uses the resolution of the device that the
+     * application is run on.
+     */
     private void calculateTextSize() {
         display = getWindowManager().getDefaultDisplay();
         Point point = new Point();
@@ -124,6 +131,9 @@ public class osmtest extends AppCompatActivity {
         textSize = screenWidth / 12;
     }
 
+    /**
+     * Method called when copyrightlink is clicked. Opens up the openstreetmap website.
+     */
     private void linkClicked() {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.openstreetmap.org/copyright")));
     }
@@ -156,8 +166,8 @@ public class osmtest extends AppCompatActivity {
     }
 
     /**
-     *
-     * @return
+     * Checks if its time to send a message with gpscoordinates to the server.
+     * @return returns if gpscoordinates should be sent to the server.
      */
     private synchronized boolean isTimeToSendMessage() {
         currentTime = System.currentTimeMillis();
