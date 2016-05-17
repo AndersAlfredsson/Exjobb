@@ -33,6 +33,9 @@ public class UserHandler implements Runnable, Serializable
     private final SensorDataHandler sensorDataHandler;
     private static ArrayList<Integer> usedIDs = new ArrayList<>();
     private int anonymousID;
+    private final int logMinimumDelay = 8000;
+    private long currentTime;
+    private long previousTime;
 
     /**
      * Constructor that sets up the connection and the I/O-ObjectStreams
@@ -188,7 +191,10 @@ public class UserHandler implements Runnable, Serializable
         else if(message instanceof RequestMessage)
         {
             GPSCoordMessage gpsCoords = ((RequestMessage) message).getGpsCoords();
-            handler.putData(gpsCoords, anonymousID);
+
+            //Log if 8 seconds has passed since last log.
+            logGPS(gpsCoords);
+            handler.putData(gpsCoords);
             handler.printMap();
 
             if(handler.getOUTER_BOX().isInsideBox(gpsCoords))
@@ -204,6 +210,14 @@ public class UserHandler implements Runnable, Serializable
             {
                 sendMessage(new ServerMessage(ServerMessageType.SensorData, null));
             }
+        }
+    }
+
+    private void logGPS(GPSCoordMessage message) {
+        currentTime = System.currentTimeMillis();
+        if (currentTime >= (previousTime + logMinimumDelay)) {
+            DBhandlerSingleton.getInstance().logGPS(anonymousID, message.getLatitude(),message.getLongitude());
+            previousTime = currentTime;
         }
     }
 
