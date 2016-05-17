@@ -24,7 +24,7 @@ public class ConnectionHandler {
     private Socket socket = null;
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
-    private final String IPADRESS = "10.22.13.244";
+    private final String IPADRESS = "192.168.1.242";
     private final int PORTNR = 9058;
     private String eMail;
 
@@ -90,7 +90,7 @@ public class ConnectionHandler {
             try {
                 ServerMessage serverMessage = (ServerMessage) in.readObject();
 
-                if (serverMessage == null) {
+                if (serverMessage == null || serverMessage.getMessage() == null) {
                     return null;
                 }
 

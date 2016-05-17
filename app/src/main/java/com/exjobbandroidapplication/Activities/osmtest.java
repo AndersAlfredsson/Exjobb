@@ -280,7 +280,12 @@ public class osmtest extends AppCompatActivity {
 
             if (serverMessage == null) {
                 Log.d("serverMessage", "Received message is null");
-                Toast.makeText(activity, "Error receiving message from server or outside bounding box" , Toast.LENGTH_LONG);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(activity, "Error receiving message from server or outside bounding box" , Toast.LENGTH_LONG);
+                    }
+                });
                 return false;
             }
 
