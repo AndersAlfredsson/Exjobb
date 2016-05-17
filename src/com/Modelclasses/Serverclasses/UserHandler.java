@@ -213,6 +213,7 @@ public class UserHandler implements Runnable, Serializable
         }
     }
 
+
     private void logGPS(GPSCoordMessage message) {
         currentTime = System.currentTimeMillis();
         if (currentTime >= (previousTime + logMinimumDelay)) {

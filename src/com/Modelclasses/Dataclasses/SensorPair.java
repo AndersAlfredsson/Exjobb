@@ -112,7 +112,7 @@ public class SensorPair
         if(expected == innerSensor) {
             innerSection.increment();
             //Log event to database.
-            DBhandlerSingleton.getInstance().logSensorEvent(innerSensor,outerSensor);
+            DBhandlerSingleton.getInstance().logSensorEvent(outerSensor, innerSensor);
             if(neighboringSection != null && neighboringSection.getAmount() > 0)
             {
                 neighboringSection.decrement();
@@ -121,7 +121,7 @@ public class SensorPair
         else
         {
             //Log event to database.
-            DBhandlerSingleton.getInstance().logSensorEvent(outerSensor, innerSensor);
+            DBhandlerSingleton.getInstance().logSensorEvent(innerSensor, outerSensor);
             if(innerSection.getAmount() > 0)
             {
                 innerSection.decrement();
