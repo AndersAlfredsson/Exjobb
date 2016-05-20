@@ -2,9 +2,8 @@ package com.Modelclasses.Dataclasses;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Random;
+import java.net.SocketException;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -48,11 +47,32 @@ public class Sensor implements Runnable
     {
         try
         {
-            this.OUT.writeInt(id);
+            if(this.isConnected)
+            {
+                try
+                {
+                    this.OUT.writeInt(id);
+                }
+                catch(SocketException e)
+                {
+                    this.s.close();
+                    this.isConnected = false;
+                }
+
+            }
             //System.out.println(id + " sent " + id);
         }
         catch (IOException e)
         {
+            try
+            {
+                this.s.close();
+            }
+            catch (IOException e1)
+            {
+                e1.printStackTrace();
+            }
+            this.isConnected = false;
             e.printStackTrace();
         }
     }
@@ -94,7 +114,17 @@ public class Sensor implements Runnable
             }
             catch (InterruptedException e)
             {
-                e.printStackTrace();
+                //e.printStackTrace();
+                System.err.println("Sensor connection failed, shutting down");
+                try
+                {
+                    this.s.close();
+                    this.isConnected = false;
+                }
+                catch (IOException e1)
+                {
+                    e1.printStackTrace();
+                }
             }
         }
     }

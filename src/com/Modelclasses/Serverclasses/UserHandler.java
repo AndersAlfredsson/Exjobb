@@ -138,9 +138,7 @@ public class UserHandler implements Runnable, Serializable
                 e.printStackTrace();
             }
         }
-        if (anonymousID != -1) {
-            usedIDs.remove(anonymousID);
-        }
+        removeAnonymousID(this.anonymousID);
     }
 
     /**
@@ -325,5 +323,24 @@ public class UserHandler implements Runnable, Serializable
             id++;
         }
         anonymousID = id;
+        usedIDs.add(id);
+    }
+
+    /**
+     * Removes an ID from the id-list if client disconnects
+     * @param id
+     */
+    private boolean removeAnonymousID(int id) {
+        ArrayList<Integer> tempList = new ArrayList<>(usedIDs);
+
+        for(int tempid : tempList)
+        {
+            if(tempid == id)
+            {
+                usedIDs.remove(id);
+                return true;
+            }
+        }
+        return false;
     }
 }

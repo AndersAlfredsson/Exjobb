@@ -31,7 +31,7 @@ public class XmlFileReader
      */
     public ArrayList readFile(final String PATH, XmlParseType type) throws  JAXBException
     {
-        JAXBContext jaxbContext = JAXBContext.newInstance(XmlWrapper.class, SensorPair.class, Section.class, GpsCoordinates.class);
+        JAXBContext jaxbContext = JAXBContext.newInstance(XmlWrapper.class, SensorPair.class, Section.class, GpsCoordinates.class, IpContainer.class);
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
         if(type == XmlParseType.SensorPair)
         {
@@ -42,6 +42,11 @@ public class XmlFileReader
         {
             ArrayList<Section> sensorPairData = unmarshal(unmarshaller, PATH);
             return sensorPairData;
+        }
+        else if(type == XmlParseType.SensorIP)
+        {
+            ArrayList<IpContainer> containers = unmarshal(unmarshaller, PATH);
+            return containers;
         }
         return null;
     }

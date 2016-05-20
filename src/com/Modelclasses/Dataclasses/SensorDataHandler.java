@@ -6,10 +6,6 @@ import com.Enums.XmlParseType;
 import com.Modelclasses.Sensorclasses.XmlFileReader;
 
 import javax.xml.bind.JAXBException;
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -112,36 +108,6 @@ public class SensorDataHandler
     }
 
     /**
-     * Reads rows of strings from a file that defines pairs
-     * @param PATH
-     * @return
-     */
-    private ArrayList<String> readDataFromFile(final String PATH)
-    {
-        ArrayList<String> dataList = new ArrayList<>();
-        try
-        {
-            BufferedReader br = new BufferedReader(new FileReader(PATH));
-            String line = br.readLine();
-            while(line != null)
-            {
-                dataList.add(line);
-                line = br.readLine();
-            }
-            br.close();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return dataList;
-    }
-
-    /**
      * Converts a list of strings to pairs and sections
      */
     private synchronized void convertToPairs()
@@ -205,6 +171,10 @@ public class SensorDataHandler
         }
     }
 
+    /**
+     * Returns the sensorsection hashmap
+     * @return
+     */
     public synchronized HashMap<Integer, Section> getSensorSections()
     {
         return this.sensorSections;

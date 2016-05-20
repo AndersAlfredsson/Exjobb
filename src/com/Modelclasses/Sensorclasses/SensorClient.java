@@ -1,10 +1,10 @@
 package com.Modelclasses.Sensorclasses;
 
 import com.Modelclasses.Dataclasses.SensorDataHandler;
+import com.Modelclasses.Serverclasses.Server;
 
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 
 /**
@@ -20,16 +20,14 @@ public class SensorClient implements Runnable
     private boolean isConnected;
     private final SensorDataHandler dataHandler;
 
-    //TODO containerclass för klienttrådar
-    //TODO sensor simulator
 
-    public SensorClient(SensorDataHandler dataHandler, String IP)
+    public SensorClient(SensorDataHandler dataHandler, IpContainer ipContainer)
     {
         this.dataHandler = dataHandler;
         try
         {
             this.isConnected = false;
-            socket = new Socket(IP, PORT);
+            socket = new Socket(ipContainer.getIP_ADDRESS(), PORT);
             IN = new DataInputStream(socket.getInputStream());
 
 
@@ -46,16 +44,24 @@ public class SensorClient implements Runnable
         while(isConnected)
         {
             try {
-                int message = IN.readInt();
-                if (message == -1)
+                if(!Server.isIsServerShutdownInitiated())
                 {
-                    disconnect();
+                    int message = IN.readInt();
+                    if (message == -1)
+                    {
+                        disconnect();
+                    }
+                    else
+                    {
+                        //System.out.println("recieved message: " + message);
+                        this.dataHandler.newValue(message);
+                    }
                 }
                 else
                 {
-                    //System.out.println("recieved message: " + message);
-                    this.dataHandler.newValue(message);
+                    disconnect();
                 }
+
             }
             catch (IOException e)
             {

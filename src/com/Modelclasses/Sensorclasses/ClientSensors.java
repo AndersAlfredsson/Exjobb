@@ -1,7 +1,9 @@
 package com.Modelclasses.Sensorclasses;
 
+import com.Enums.XmlParseType;
 import com.Modelclasses.Dataclasses.SensorDataHandler;
 
+import javax.xml.bind.JAXBException;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -15,7 +17,7 @@ import java.util.concurrent.Executors;
  */
 public class ClientSensors
 {
-    private ArrayList<String> IpList;
+    private ArrayList<IpContainer> IpList;
     private SensorDataHandler handler;
     private final ExecutorService pool;
 
@@ -24,7 +26,7 @@ public class ClientSensors
         this.IpList = new ArrayList<>();
         this.handler = handler;
         this.pool = Executors.newCachedThreadPool();
-        if(readIpsFromFile("src/com/Modelclasses/Sensorclasses/SensorIps.txt"))
+        if(readIpsFromFile("src/com/Modelclasses/Sensorclasses/SensorIps.xml"))
         {
             System.out.println("Read clients");
             createClients();
@@ -36,30 +38,26 @@ public class ClientSensors
     }
     private void createClients()
     {
-        for(String ip : IpList)
+        for(IpContainer ip : IpList)
         {
             pool.execute(new SensorClient(this.handler, ip));
         }
     }
+
+    /**
+     * Reads the IP-addresses from a xml-file
+     * @param PATH
+     * @return
+     */
     private boolean readIpsFromFile(String PATH)
     {
+        XmlFileReader fr = new XmlFileReader();
         try
         {
-            BufferedReader br = new BufferedReader(new FileReader(PATH));
-            String line = br.readLine();
-            while(line != null)
-            {
-                IpList.add(line);
-                line = br.readLine();
-            }
-            br.close();
+            this.IpList = fr.readFile(PATH, XmlParseType.SensorIP);
             return true;
         }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
+        catch (JAXBException e)
         {
             e.printStackTrace();
         }
