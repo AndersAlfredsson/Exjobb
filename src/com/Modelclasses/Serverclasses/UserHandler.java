@@ -204,6 +204,10 @@ public class UserHandler implements Runnable, Serializable
                 sendMessage(new ServerMessage(ServerMessageType.SensorData, null));
             }
         }
+        else
+        {
+            disconnect("Unknown message type");
+        }
     }
 
     private void logGPS(GPSCoordMessage message) {
