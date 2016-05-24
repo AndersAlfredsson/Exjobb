@@ -4,9 +4,7 @@ import Enums.ServerMessageType;
 import NetworkMessages.*;
 import com.Modelclasses.ApplicationUser;
 import com.Modelclasses.Dataclasses.BoundingBox;
-import com.Modelclasses.Dataclasses.SensorDataHandler;
 import com.Modelclasses.PasswordSecurity;
-import com.Modelclasses.Sensorclasses.ClientSensors;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -20,7 +18,8 @@ public class SocketTest
 {
     public static void main(String[] args)
     {
-        ClientSensors s = new ClientSensors(new SensorDataHandler());
+        //ClientSensors s = new ClientSensors(new SensorDataHandler());
+        Connect();
     }
 
 
@@ -56,7 +55,7 @@ public class SocketTest
 
     private static void Connect()
     {
-        ApplicationUser user = new ApplicationUser("dev@dev.com", "dev");
+        ApplicationUser user = new ApplicationUser("dev123@dev.com", "dev");
         boolean keepConnection = true;
         Socket s = null;
         final ObjectOutputStream OUT;
@@ -72,7 +71,7 @@ public class SocketTest
 
             Thread.sleep(100);
 
-            OUT.writeObject(new LoginMessage(user.getEmail(), user.getPassword()));
+            OUT.writeObject(new RegisterMessage(user.getEmail(), user.getPassword()));
 
             ServerMessage message = (ServerMessage) IN.readObject();
 
@@ -91,8 +90,8 @@ public class SocketTest
             while(keepConnection)
             {
                 System.out.println("Still connected");
-                OUT.writeObject(new RequestMessage(new GPSCoordMessage(user.getEmail(), 1.0, 1.0)));
-                Thread.sleep(10000);
+                //OUT.writeObject(new RequestMessage(new GPSCoordMessage(user.getEmail(), 1.0, 1.0)));
+                Thread.sleep(5000);
                 System.out.println("Trying to disconnect");
                 OUT.writeObject(new DisconnectMessage(user.getEmail()));
                 message = (ServerMessage) IN.readObject();

@@ -196,7 +196,7 @@ public class SensorDataHandler
                 i++;
             }
         }
-        System.out.println("Janitor cleaned sensor data with " + i + " removed");
+        //System.out.println("Janitor cleaned sensor data with " + i + " removed");
     }
 
     /**

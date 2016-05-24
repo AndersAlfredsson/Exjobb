@@ -1,5 +1,7 @@
 package com.Modelclasses.Dataclasses;
 
+import com.Modelclasses.Serverclasses.Server;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -19,7 +21,7 @@ public class Sensor implements Runnable
 
     public Sensor(Socket s, int ID1, int ID2)
     {
-        System.out.println("Sensor was connected " + ID1 + "&" + ID2);
+        //System.out.println("Sensor was connected " + ID1 + "&" + ID2);
         this.ID1 = ID1;
         this.ID2 = ID2;
         this.s = s;
@@ -55,8 +57,7 @@ public class Sensor implements Runnable
                 }
                 catch(SocketException e)
                 {
-                    this.s.close();
-                    this.isConnected = false;
+                    disconnect();
                 }
 
             }
@@ -64,16 +65,7 @@ public class Sensor implements Runnable
         }
         catch (IOException e)
         {
-            try
-            {
-                this.s.close();
-            }
-            catch (IOException e1)
-            {
-                e1.printStackTrace();
-            }
-            this.isConnected = false;
-            e.printStackTrace();
+            disconnect();
         }
     }
 
@@ -89,43 +81,55 @@ public class Sensor implements Runnable
         while(this.isConnected)
         {
             int sleepTime = (ThreadLocalRandom.current().nextInt(2, 20+1))*1000;
-            try
+            if(!Server.isIsServerShutdownInitiated())
             {
-                Thread.sleep(sleepTime);
-                if(ThreadLocalRandom.current().nextInt(0, 100) < 50) {
-                    //System.out.println("Sleeping for " + sleepTime + " ms");
-
-                    int whoSend = ThreadLocalRandom.current().nextInt(this.ID1, this.ID2 + 1);
-                    int other;
-                    if (whoSend == this.ID1) {
-                        other = this.ID2;
-                    } else {
-                        other = this.ID1;
-                    }
-                    //System.out.println("sending: " + whoSend + ", from " + this.toString());
-                    sendMessage(whoSend);
-                    sleepTime = (ThreadLocalRandom.current().nextInt(1, 5 + 1)) * 1000;
-                    Thread.sleep(sleepTime);
-                    if (ThreadLocalRandom.current().nextInt(0, 100) < 95) {
-                        //System.out.println("sending: " + other + ", from " + this.toString());
-                        sendMessage(other);
-                    }
-                }
-            }
-            catch (InterruptedException e)
-            {
-                //e.printStackTrace();
-                System.err.println("Sensor connection failed, shutting down");
                 try
                 {
-                    this.s.close();
-                    this.isConnected = false;
+                    Thread.sleep(sleepTime);
+                    if(ThreadLocalRandom.current().nextInt(0, 100) < 50) {
+                        //System.out.println("Sleeping for " + sleepTime + " ms");
+
+                        int whoSend = ThreadLocalRandom.current().nextInt(this.ID1, this.ID2 + 1);
+                        int other;
+                        if (whoSend == this.ID1) {
+                            other = this.ID2;
+                        } else {
+                            other = this.ID1;
+                        }
+                        //System.out.println("sending: " + whoSend + ", from " + this.toString());
+                        sendMessage(whoSend);
+                        sleepTime = (ThreadLocalRandom.current().nextInt(1, 5 + 1)) * 1000;
+                        Thread.sleep(sleepTime);
+                        if (ThreadLocalRandom.current().nextInt(0, 100) < 95) {
+                            //System.out.println("sending: " + other + ", from " + this.toString());
+                            sendMessage(other);
+                        }
+                    }
                 }
-                catch (IOException e1)
+                catch (InterruptedException e)
                 {
-                    e1.printStackTrace();
+                    //e.printStackTrace();
+                    System.err.println("Sensor connection failed, shutting down");
+                    disconnect();
                 }
             }
+            else
+            {
+                disconnect();
+            }
         }
+    }
+    private void disconnect()
+    {
+        try
+        {
+            this.OUT.flush();
+            this.s.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        this.isConnected = false;
     }
 }

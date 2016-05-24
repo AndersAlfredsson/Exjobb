@@ -10,5 +10,6 @@ public class Main {
         SensorSimulator s = new SensorSimulator();
         Server server = new Server();
         server.startServer();
+        s.shutdownAndAwaitTermination();
     }
 }

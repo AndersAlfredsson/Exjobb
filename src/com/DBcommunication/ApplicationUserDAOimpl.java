@@ -3,10 +3,12 @@ package com.DBcommunication;
 import com.Enums.LogEvents;
 import com.Interfaces.ApplicationUserDAO;
 import com.Modelclasses.ApplicationUser;
-import com.Modelclasses.PasswordSecurity;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -108,11 +110,11 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
             preparedStatement.setString(1, user.getPassword());
             preparedStatement.setString(2, user.getEmail());
             if (preparedStatement.executeUpdate() == 0){
-                System.out.println("Trollololo");
+
             }
             else {
             DBhandlerSingleton.getInstance().log(LogEvents.Insert, user);
-            System.out.println("log");
+
         }
 
         } catch (SQLException e) {
@@ -130,11 +132,11 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
             PreparedStatement preparedStatement =  DBhandlerSingleton.getInstance().getConnection().prepareStatement("DELETE FROM Users WHERE Email = ?;");
             preparedStatement.setString(1, user.getEmail());
             if (preparedStatement.executeUpdate() == 0){
-                System.out.println("Trollololo");
+
             }
             else {
                 DBhandlerSingleton.getInstance().log(LogEvents.Insert, user);
-                System.out.println("log");
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -153,11 +155,11 @@ public class ApplicationUserDAOimpl implements ApplicationUserDAO {
             preparedStatement.setString(2, user.getPassword());
             preparedStatement.setString(3, user.getSalt());
             if (preparedStatement.executeUpdate() == 0){
-                System.out.println("Trollololo");
+
             }
             else {
                 DBhandlerSingleton.getInstance().log(LogEvents.Insert, user);
-                System.out.println("log");
+
             }
 
         } catch (SQLException e) {

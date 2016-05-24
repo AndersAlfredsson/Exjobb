@@ -16,12 +16,8 @@ public class SensorSimulator
 {
     private HashMap<Integer, Sensor> outMap;
     private final ExecutorService pool;
+    public boolean runSimulator;
 
-
-    public static void main(String[] args)
-    {
-        SensorSimulator s = new SensorSimulator();
-    }
 
     /**
      * Listens for connections from server
@@ -30,47 +26,54 @@ public class SensorSimulator
     {
         outMap = new HashMap<>();
         this.pool = Executors.newCachedThreadPool();
+        runSimulator = true;
+        start();
 
-        new Thread(() -> {
+
+    }
+    private void start()
+    {
+        Thread test = new Thread (() -> {
             ServerSocket s;
             int i = 0;
             try
             {
                 System.out.println("SensorListener started");
                 s = new ServerSocket(2390);
-                while(true)
+                while(runSimulator)
                 {
                     Sensor sensor;
                     pool.execute(sensor = new Sensor(s.accept(), i++, i++));
                     outMap.put(sensor.getID1(), sensor);
                 }
-
             }
             catch (IOException e)
             {
                 e.printStackTrace();
+                shutdownAndAwaitTermination();
             }
-        }).start();
-
+        });
+        test.setDaemon(true);
+        test.start();
     }
 
     /**
      * Shutdowns
-     * @param pool
      */
-    private void shutdownAndAwaitTermination(ExecutorService pool)
+    public void shutdownAndAwaitTermination()
     {
+        runSimulator = false;
         try
         {
-            if(!pool.awaitTermination(60, TimeUnit.SECONDS))
+            if(!pool.awaitTermination(10, TimeUnit.SECONDS))
             {
                 pool.shutdownNow();
-                if(!pool.awaitTermination(60, TimeUnit.SECONDS))
+                if(!pool.awaitTermination(10, TimeUnit.SECONDS))
                 {
                     System.err.println("Pool did not terminate correctly");
                 }
             }
-            System.out.println("Pool exited...");
+            System.out.println("SimulatorPool exited...");
         }
         catch(InterruptedException ie)
         {

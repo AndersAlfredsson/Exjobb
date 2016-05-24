@@ -40,6 +40,7 @@ public class SensorClient implements Runnable
     @Override
     public void run()
     {
+        //System.out.println("Started sensorconnection");
         isConnected = true;
         while(isConnected)
         {
@@ -65,7 +66,8 @@ public class SensorClient implements Runnable
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                //e.printStackTrace();
+                System.err.println("Sensor exited...");
             }
         }
     }

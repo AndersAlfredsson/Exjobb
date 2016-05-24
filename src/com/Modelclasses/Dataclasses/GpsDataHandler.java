@@ -2,7 +2,6 @@ package com.Modelclasses.Dataclasses;
 
 import NetworkMessages.GPSCoordMessage;
 import NetworkMessages.GpsCoordinates;
-import com.DBcommunication.DBhandlerSingleton;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -80,7 +79,7 @@ public class GpsDataHandler
      */
     public synchronized void cleanup()
     {
-        System.out.println("GpsData Cleanup started...");
+        //System.out.println("GpsData Cleanup started...");
         HashMap<String, GpsDataContainer> copy = new HashMap<>(this.dataMap);
         final int TIMEDIFFERENCE = 2; //The max amount of time difference in minutes before it gets removed
 
@@ -111,7 +110,7 @@ public class GpsDataHandler
                 }
             }
         }
-        System.out.println("GpsData Cleanup done with " + amountRemoved + " removed");
+        //System.out.println("GpsData Cleanup done with " + amountRemoved + " removed");
     }
 
 
@@ -187,7 +186,7 @@ public class GpsDataHandler
             this.message = message;
             this.lastUpdatedHour = lastUpdated.getHour();
             this.lastUpdatedMinute = lastUpdated.getMinute();
-            System.out.println("time: " + lastUpdatedHour + ":" + lastUpdatedMinute + ":"+lastUpdated.getSecond());
+            //System.out.println("time: " + lastUpdatedHour + ":" + lastUpdatedMinute + ":"+lastUpdated.getSecond());
         }
 
         //region Getters and Setters

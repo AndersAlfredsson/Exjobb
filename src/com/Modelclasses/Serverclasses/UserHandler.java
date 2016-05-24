@@ -16,7 +16,6 @@ import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 /**
  * Created by Gustav on 2016-04-19.
@@ -138,7 +137,6 @@ public class UserHandler implements Runnable, Serializable
                 e.printStackTrace();
             }
         }
-        removeAnonymousID(this.anonymousID);
     }
 
     /**
@@ -186,22 +184,19 @@ public class UserHandler implements Runnable, Serializable
             DBhandlerSingleton.getInstance().log(LogEvents.Disconnect, new ApplicationUser(message.getUsername(), null));
             disconnect("Disconnect request");
         }
-        else if(message instanceof RequestMessage)
+        else if(message instanceof RequestMessage && this.authenticated)
         {
             GPSCoordMessage gpsCoords = ((RequestMessage) message).getGpsCoords();
 
             //Log if 8 seconds has passed since last log.
             logGPS(gpsCoords);
             handler.putData(gpsCoords);
-            handler.printMap();
 
             if(handler.getOUTER_BOX().isInsideBox(gpsCoords))
             {
                 ArrayList<GpsCoordinates> data = handler.getGpsData(((RequestMessage) message).getGpsCoords().getUsername());
                 HashMap<Integer, Section> sectionData = sensorDataHandler.getSensorSections();
                 SensorDataMessage sdm = new SensorDataMessage(data, sectionData);
-                System.out.println(sdm.getSectionMap().get(0).getAmount());
-                System.out.println(sdm.getSectionMap().get(1).getAmount());
                 sendMessage(new ServerMessage(ServerMessageType.SensorData, sdm));
             }
             else
@@ -210,7 +205,6 @@ public class UserHandler implements Runnable, Serializable
             }
         }
     }
-
 
     private void logGPS(GPSCoordMessage message) {
         currentTime = System.currentTimeMillis();
@@ -228,6 +222,7 @@ public class UserHandler implements Runnable, Serializable
     {
         if(this.connected)
         {
+            //System.out.println("msg: " + message.getMessageType());
             try
             {
                 this.OUT.writeObject(message);
@@ -253,14 +248,14 @@ public class UserHandler implements Runnable, Serializable
             this.SOCKET.close();
             this.connected = false;
             this.authenticated = false;
+            removeAnonymousID(this.anonymousID);
             return true;
         }
-        catch (IOException e)
-        {
-            System.err.println("Disconnect unsuccessful");
+        catch (IOException e) {
+            //System.err.println("Disconnect unsuccessful");
             e.printStackTrace();
-            return false;
         }
+        return false;
     }
 
     /**
@@ -334,11 +329,11 @@ public class UserHandler implements Runnable, Serializable
     private boolean removeAnonymousID(int id) {
         ArrayList<Integer> tempList = new ArrayList<>(usedIDs);
 
-        for(int tempid : tempList)
+        for(int i = 0; i< tempList.size(); i++)
         {
-            if(tempid == id)
+            if(tempList.get(i) == id)
             {
-                usedIDs.remove(id);
+                usedIDs.remove(i);
                 return true;
             }
         }
