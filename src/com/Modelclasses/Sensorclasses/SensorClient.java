@@ -6,6 +6,7 @@ import com.Modelclasses.Serverclasses.Server;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 /**
  * Created by Gustav on 2016-05-06.
@@ -19,15 +20,17 @@ public class SensorClient implements Runnable
     private DataInputStream IN;
     private boolean isConnected;
     private final SensorDataHandler dataHandler;
+    private final IpContainer CONTAINER;
 
 
     public SensorClient(SensorDataHandler dataHandler, IpContainer ipContainer)
     {
         this.dataHandler = dataHandler;
+        this.CONTAINER = ipContainer;
         try
         {
             this.isConnected = false;
-            socket = new Socket(ipContainer.getIP_ADDRESS(), PORT);
+            socket = new Socket(this.CONTAINER.getIP_ADDRESS(), PORT);
             IN = new DataInputStream(socket.getInputStream());
 
 
@@ -48,7 +51,7 @@ public class SensorClient implements Runnable
                 if(!Server.isIsServerShutdownInitiated())
                 {
                     int message = IN.readInt();
-                    if (message == -1)
+                    if (message == 0)
                     {
                         disconnect();
                     }
@@ -66,6 +69,7 @@ public class SensorClient implements Runnable
             }
             catch (IOException e)
             {
+                reconnect();
                 //e.printStackTrace();
                 System.err.println("Sensor exited...");
             }
@@ -82,6 +86,37 @@ public class SensorClient implements Runnable
         catch (IOException e)
         {
             e.printStackTrace();
+        }
+    }
+    private void reconnect()
+    {
+        this.isConnected = false;
+        int i = 0;
+        while(!this.isConnected || i < 5)
+        {
+            try
+            {
+                socket = new Socket(this.CONTAINER.getIP_ADDRESS(), PORT);
+                IN = new DataInputStream(socket.getInputStream());
+                Thread.sleep(1000);
+                i++;
+                this.isConnected = true;
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+                this.isConnected = false;
+            }
+            catch (UnknownHostException e)
+            {
+                e.printStackTrace();
+                this.isConnected = false;
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+                this.isConnected = false;
+            }
         }
     }
 }

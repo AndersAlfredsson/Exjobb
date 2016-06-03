@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <SensorPairs>
     <SensorPair>
-        <innerSensor>1</innerSensor>
-        <outerSensor>0</outerSensor>
-        <innerSectionID>0</innerSectionID>
+        <innerSensor>2</innerSensor>
+        <outerSensor>1</outerSensor>
+        <innerSectionID>1</innerSectionID>
         <outerSectionID>-1</outerSectionID>
     </SensorPair>
     <SensorPair>
-        <innerSensor>2</innerSensor>
-        <outerSensor>3</outerSensor>
-        <innerSectionID>0</innerSectionID>
-        <outerSectionID>1</outerSectionID>
+        <innerSensor>3</innerSensor>
+        <outerSensor>4</outerSensor>
+        <innerSectionID>1</innerSectionID>
+        <outerSectionID>2</outerSectionID>
     </SensorPair>
     <SensorPair>
-        <innerSensor>4</innerSensor>
-        <outerSensor>5</outerSensor>
-        <innerSectionID>1</innerSectionID>
+        <innerSensor>5</innerSensor>
+        <outerSensor>6</outerSensor>
+        <innerSectionID>3</innerSectionID>
         <outerSectionID>-1</outerSectionID>
     </SensorPair>
 </SensorPairs>

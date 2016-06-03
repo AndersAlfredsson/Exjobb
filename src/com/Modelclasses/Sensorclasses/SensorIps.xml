@@ -1,15 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <IpContainers>
     <IpContainer>
-        <ID>0</ID>
-        <IP_ADDRESS>127.0.0.1</IP_ADDRESS>
-    </IpContainer>
-    <IpContainer>
         <ID>1</ID>
-        <IP_ADDRESS>127.0.0.1</IP_ADDRESS>
+        <IP_ADDRESS>10.178.100.103</IP_ADDRESS>
     </IpContainer>
     <IpContainer>
         <ID>2</ID>
-        <IP_ADDRESS>127.0.0.1</IP_ADDRESS>
+        <IP_ADDRESS>10.178.100.104</IP_ADDRESS>
+    </IpContainer>
+    <IpContainer>
+        <ID>3</ID>
+        <IP_ADDRESS>10.178.100.105</IP_ADDRESS>
+    </IpContainer>
+    <IpContainer>
+        <ID>4</ID>
+        <IP_ADDRESS>10.178.100.106</IP_ADDRESS>
+    </IpContainer>
+    <IpContainer>
+        <ID>5</ID>
+        <IP_ADDRESS>10.178.100.107</IP_ADDRESS>
+    </IpContainer>
+    <IpContainer>
+        <ID>6</ID>
+        <IP_ADDRESS>10.178.100.108</IP_ADDRESS>
     </IpContainer>
 </IpContainers>

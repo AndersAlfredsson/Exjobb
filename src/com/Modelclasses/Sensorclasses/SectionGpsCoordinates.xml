@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Sections>
     <Section>
-        <ID>0</ID>
+        <ID>1</ID>
         <Coordinates>
             <Coordinate>
                 <Latitude>59.254562</Latitude>
@@ -22,7 +22,7 @@
         </Coordinates>
     </Section>
     <Section>
-        <ID>1</ID>
+        <ID>2</ID>
         <Coordinates>
             <Coordinate>
                 <Latitude>59.254562</Latitude>
