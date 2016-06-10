@@ -18,10 +18,7 @@ public class DBhandlerSingleton {
     private Connection connection = null;
     private ResultSet resultSet = null;
     private final String DRIVER = "org.sqlite.JDBC";
-    private final String URL = "JDBC:sqlite:src/com/Database/DB.db";
-
-
-    //
+    private final String URL = "JDBC:sqlite:C:/Users/Franziska/Desktop/TakeBackTheNight/src/com/Database/DB.db";
 
     /**
      * Private constructor to prevent initialization from outside of the class.

@@ -4,6 +4,8 @@ import Enums.ServerMessageType;
 import NetworkMessages.*;
 import com.Modelclasses.ApplicationUser;
 import com.Modelclasses.Dataclasses.BoundingBox;
+import com.Modelclasses.Dataclasses.GpsDataHandler;
+import com.Modelclasses.Dataclasses.SensorDataHandler;
 import com.Modelclasses.PasswordSecurity;
 
 import java.io.IOException;
@@ -19,24 +21,19 @@ public class SocketTest
     public static void main(String[] args)
     {
         //ClientSensors s = new ClientSensors(new SensorDataHandler());
-        Connect();
+        //Connect();
+        test();
     }
 
 
 
     public static void test()
     {
-        ApplicationUser u = new ApplicationUser("hej", "hej");
-        PasswordSecurity.hashPassword(u);
-        ApplicationUser dbUser = new ApplicationUser(0, "hej", u.getPassword(), u.getSalt());
-        u.setPassword("hej");
-        if(PasswordSecurity.authenticate(u, dbUser))
-        {
-            System.out.println("what");
-        }
-        else
-        {
-            System.out.println("vafan händer?!");
+        LoginServer loginServer;
+        try {
+            (new Thread(loginServer = new LoginServer(12689, new GpsDataHandler(), new SensorDataHandler()))).start();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }

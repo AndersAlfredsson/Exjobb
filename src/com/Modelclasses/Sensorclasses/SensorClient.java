@@ -32,9 +32,8 @@ public class SensorClient implements Runnable
             this.isConnected = false;
             socket = new Socket(this.CONTAINER.getIP_ADDRESS(), PORT);
             IN = new DataInputStream(socket.getInputStream());
-
-
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             e.printStackTrace();
         }
@@ -47,7 +46,8 @@ public class SensorClient implements Runnable
         isConnected = true;
         while(isConnected)
         {
-            try {
+            try
+            {
                 if(!Server.isIsServerShutdownInitiated())
                 {
                     int message = IN.readInt();
@@ -71,7 +71,7 @@ public class SensorClient implements Runnable
             {
                 reconnect();
                 //e.printStackTrace();
-                System.err.println("Sensor exited...");
+                System.err.println("Sensor disconnected...");
             }
         }
     }

@@ -26,9 +26,9 @@ public class SensorDataHandler
         this.expectedValues = new ArrayList<>();
         try
         {
-            this.sensorPairs = reader.readFile("src/com/Modelclasses/Sensorclasses/SensorPairs.xml", XmlParseType.SensorPair);
+            this.sensorPairs = reader.readFile("C:/Users/Franziska/Desktop/TakeBackTheNight/config/SensorPairs.xml", XmlParseType.SensorPair);
             convertToPairs();
-            ArrayList<Section> sectionData = reader.readFile("src/com/Modelclasses/Sensorclasses/SectionGpsCoordinates.xml", XmlParseType.SectionGPS);
+            ArrayList<Section> sectionData = reader.readFile("C:/Users/Franziska/Desktop/TakeBackTheNight/config/SectionGpsCoordinates.xml", XmlParseType.SectionGPS);
             AddSectionsToMap(sectionData);
         }
         catch (JAXBException e)
@@ -133,7 +133,6 @@ public class SensorDataHandler
                 }
             }
             pair.setInnerSection(section);
-
 
             int outerSectionId = pair.getOuterSectionID();
             if(!this.sensorSections.containsKey(outerSectionId) && outerSectionId != -1)

@@ -123,6 +123,7 @@ public class UserHandler implements Runnable, Serializable
                 try
                 {
                     System.err.println("Client closed connection without disconnect...");
+                    removeAnonymousID(this.anonymousID);
 
                     this.SOCKET.close();
                 }

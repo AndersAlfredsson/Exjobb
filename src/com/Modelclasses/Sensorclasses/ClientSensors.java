@@ -26,9 +26,9 @@ public class ClientSensors
         this.IpList = new ArrayList<>();
         this.handler = handler;
         this.pool = Executors.newCachedThreadPool();
-        if(readIpsFromFile("src/com/Modelclasses/Sensorclasses/SensorIps.xml"))
+        if(readIpsFromFile("C:/Users/Franziska/Desktop/TakeBackTheNight/config/SensorIps.xml"))
         {
-            System.out.println("Read clients");
+            //System.out.println("Read clients");
             createClients();
         }
         else
@@ -38,7 +38,7 @@ public class ClientSensors
     }
     private void createClients()
     {
-        for(IpContainer ip : IpList)
+        for(IpContainer ip : this.IpList)
         {
             pool.execute(new SensorClient(this.handler, ip));
         }

@@ -41,7 +41,7 @@ public class Server
     {
         try
         {
-            (new Thread(this.loginServer = new LoginServer(9058, gpsDataHandler, sensorDataHandler))).start();
+            (new Thread(this.loginServer = new LoginServer(8181, gpsDataHandler, sensorDataHandler))).start();
             janitor.startCleanupThread();
             System.out.println("Type 'quit', 'shutdown' or 'exit' to initiate shutdown");
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
@@ -83,6 +83,7 @@ public class Server
         {
             e.printStackTrace();
         }
+        System.out.println("Server shutdown completed!");
     }
 
     public static boolean isIsServerShutdownInitiated()
