@@ -392,7 +392,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                Intent loginIntent = new Intent(loginActivity,osmtest.class);
+                Intent loginIntent = new Intent(loginActivity,MapActivity.class);
                 startActivity(loginIntent);
             } else {
                 Log.d("LoginError", "Error when trying to login or connect to server");

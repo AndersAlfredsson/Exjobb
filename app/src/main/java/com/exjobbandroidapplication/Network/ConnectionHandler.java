@@ -25,7 +25,7 @@ public class ConnectionHandler {
     private ObjectOutputStream out = null;
     private ObjectInputStream in = null;
     private final String IPADRESS = "192.168.1.242";
-    private final int PORTNR = 9058;
+    private final int PORTNR = 8181;
     private String eMail;
 
     public static ConnectionHandler getInstance() {
@@ -53,11 +53,12 @@ public class ConnectionHandler {
         }
     }
 
-    private void disconnect() {
+    public boolean disconnect() {
         ServerMessage serverMessage = sendMessage(new DisconnectMessage(eMail));
-        if (serverMessage.getMessageType() == ServerMessageType.Disconnect) {
+        if (serverMessage != null && serverMessage.getMessageType() == ServerMessageType.Disconnect) {
             closeStreams();
         }
+        return true;
     }
 
     /**
@@ -94,18 +95,8 @@ public class ConnectionHandler {
                     return null;
                 }
 
-                if (serverMessage.getMessageType() == ServerMessageType.SensorData) {
-                    SensorDataMessage sensorDataMessage = (SensorDataMessage) serverMessage.getMessage();
-                    ServerMessage serverMessage1 = new ServerMessage(ServerMessageType.SensorData ,sensorDataMessage);
-                    Log.d("Server message = ", String.valueOf(serverMessage));
-                    SensorDataMessage s = (SensorDataMessage)serverMessage1.getMessage();
-                    int i = s.getSectionMap().get(0).getAmount();
-                    Log.d("Amount = ",  Integer.toString(i));
-                }
+                return serverMessage;
 
-                if (serverMessage != null) {
-                    return serverMessage;
-                }
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }

@@ -48,8 +48,8 @@ import NetworkMessages.Section;
 import NetworkMessages.SensorDataMessage;
 import NetworkMessages.ServerMessage;
 
-public class osmtest extends AppCompatActivity {
-    private osmtest activity = this;
+public class MapActivity extends AppCompatActivity {
+    private MapActivity activity = this;
     private MapView map;
     private long lastMessageTime = 0;
     private long currentTime;
@@ -60,6 +60,7 @@ public class osmtest extends AppCompatActivity {
     private int screenHeight;
     private int screenWidth;
     private int textSize;
+    private static boolean finish = false;
 
     /**
      * Is run when the activity is created.
@@ -68,7 +69,7 @@ public class osmtest extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        finish = false;
         calculateTextSize();
 
         //Hide the titlebar.
@@ -97,6 +98,10 @@ public class osmtest extends AppCompatActivity {
         IMyLocationConsumer iMyLocationConsumer = new IMyLocationConsumer() {
             @Override
             public synchronized void onLocationChanged(Location location, IMyLocationProvider source) {
+                if (finish) {
+                    finish();
+                    return;
+                }
                 Log.d("GPS", "Location has changed");
                 if (location == null){
                     Log.d("GPS","Location is null");
@@ -131,6 +136,8 @@ public class osmtest extends AppCompatActivity {
         textSize = screenWidth / 12;
     }
 
+    //TODO : Skit som ligger kvar efter finish() har kallats kan göra så att sektionerna inte visas.
+
     /**
      * Method called when copyrightlink is clicked. Opens up the openstreetmap website.
      */
@@ -163,6 +170,13 @@ public class osmtest extends AppCompatActivity {
            return true;
        }
    });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        sendDisconnectMessage sendDisconnectMessage = new sendDisconnectMessage();
+        sendDisconnectMessage.execute();
     }
 
     /**
@@ -275,6 +289,10 @@ public class osmtest extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... params) {
+            if (finish) {
+                finish();
+                return false;
+            }
             GPSCoordMessage message = new GPSCoordMessage(ConnectionHandler.getInstance().geteMail(), location.getLatitude(),location.getLongitude());
             ServerMessage serverMessage = ConnectionHandler.getInstance().sendMessage(new RequestMessage(message));
 
@@ -289,7 +307,7 @@ public class osmtest extends AppCompatActivity {
                 return false;
             }
 
-            if (serverMessage != null && serverMessage.getMessageType() == ServerMessageType.SensorData) {
+            if (serverMessage.getMessageType() == ServerMessageType.SensorData) {
                 if (serverMessage.getMessage() == null) {
                     Log.d("Received message", "information is null, user outside of bounding box or GPS turned of");
                 }
@@ -303,6 +321,10 @@ public class osmtest extends AppCompatActivity {
                     }
                 });
                 Log.d("GPS", "Received sensor data, running displayGPSCoordinates()");
+            }
+            else if (serverMessage.getMessageType() == ServerMessageType.Disconnect) {
+                Toast.makeText(activity, "You have been disconnected from the server", Toast.LENGTH_LONG).show();
+                Log.d("Disconnect", "Client has been disconnected from server");
             }
             return true;
         }
@@ -318,4 +340,31 @@ public class osmtest extends AppCompatActivity {
             }
         }
     }
+
+    private void closeActivity() {
+        Log.d("Close", "ACtivity");
+        finish = true;
+        this.finish();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    class sendDisconnectMessage extends AsyncTask<Void, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            boolean close = ConnectionHandler.getInstance().disconnect();
+            return close;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean close) {
+            if (close) {
+                closeActivity();
+            }
+        }
+    }
+
 }
